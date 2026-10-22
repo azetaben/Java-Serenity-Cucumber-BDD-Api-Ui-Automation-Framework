@@ -1,0 +1,16 @@
+# CucumberTestSuite (Java 17+, Maven; defaults to @CartPrice)
+mvn clean verify
+
+# Override the default Cucumber tag expression
+mvn clean verify "-Dcucumber.filter.tags=(@Smoke or @Regression) and not @manual"
+
+# Headless Chrome
+mvn clean verify -Dheadless.mode=true
+
+# Remote Selenium Grid
+mvn clean verify -Denvironment=grid -Dwebdriver.remote.url=http://localhost:4444 -Dheadless.mode=true
+
+# The Serenity aggregate report is generated during mvn clean verify:
+# reports/AUTOMATION_TEST_REPORT_<timestamp>/index.html
+# Raw Serenity data: target/site/serenity
+# Failsafe XML: target/failsafe-reports/

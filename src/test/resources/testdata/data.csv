@@ -1,0 +1,10 @@
+caseId,username,password,expectedPage,expectedError
+standard,standard_user,secret_sauce,inventory,
+problem,problem_user,secret_sauce,inventory,
+performance,performance_glitch_user,secret_sauce,inventory,
+error,error_user,secret_sauce,inventory,
+visual,visual_user,secret_sauce,inventory,
+locked,locked_out_user,secret_sauce,login,"Epic sadface: Sorry, this user has been locked out."
+invalid_password,standard_user,incorrect_password,login,Epic sadface: Username and password do not match any user in this service
+missing_username,,secret_sauce,login,Epic sadface: Username is required
+missing_password,standard_user,,login,Epic sadface: Password is required

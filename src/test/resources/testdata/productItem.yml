@@ -1,0 +1,30 @@
+- caseId: "backpack"
+  productId: 4
+  title: "Sauce Labs Backpack"
+  slug: "sauce-labs-backpack"
+  price: "$29.99"
+- caseId: "onesie"
+  productId: 2
+  title: "Sauce Labs Onesie"
+  slug: "sauce-labs-onesie"
+  price: "$7.99"
+- caseId: "bolt_t_shirt"
+  productId: 1
+  title: "Sauce Labs Bolt T-Shirt"
+  slug: "sauce-labs-bolt-t-shirt"
+  price: "$15.99"
+- caseId: "fleece_jacket"
+  productId: 5
+  title: "Sauce Labs Fleece Jacket"
+  slug: "sauce-labs-fleece-jacket"
+  price: "$49.99"
+- caseId: "bike_light"
+  productId: 0
+  title: "Sauce Labs Bike Light"
+  slug: "sauce-labs-bike-light"
+  price: "$9.99"
+- caseId: "red_t_shirt"
+  productId: 3
+  title: "Test.allTheThings() T-Shirt (Red)"
+  slug: "test.allthethings()-t-shirt-(red)"
+  price: "$15.99"

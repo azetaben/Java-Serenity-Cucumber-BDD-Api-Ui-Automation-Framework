@@ -1,0 +1,86 @@
+name: saucedemo-ci
+
+x-test-runner: &test-runner
+  build: .
+  environment: &test-environment
+    TEST_ENVIRONMENT: ${TEST_ENVIRONMENT:-staging}
+    EXECUTION_PROVIDER: ${EXECUTION_PROVIDER:-grid}
+    HEADLESS_MODE: ${HEADLESS_MODE:-true}
+    CUCUMBER_FILTER_TAGS: ${CUCUMBER_FILTER_TAGS:-@CartPrice}
+    TEST_SUITE: ${TEST_SUITE:-**/CucumberTestSuite.java}
+    SELENIUM_GRID_URL: http://selenium-hub:4444
+    SAUCEDEMO_STAGING_URL: ${SAUCEDEMO_STAGING_URL:-https://www.saucedemo.com}
+    SAUCEDEMO_SIT_URL: ${SAUCEDEMO_SIT_URL:-}
+    SAUCEDEMO_UAT_URL: ${SAUCEDEMO_UAT_URL:-}
+    SAUCEDEMO_PRODUCTION_URL: ${SAUCEDEMO_PRODUCTION_URL:-}
+    SAUCEDEMO_TEST_USERNAME: ${SAUCEDEMO_TEST_USERNAME:-}
+    SAUCEDEMO_TEST_PASSWORD: ${SAUCEDEMO_TEST_PASSWORD:-}
+    BROWSERSTACK_USERNAME: ${BROWSERSTACK_USERNAME:-}
+    BROWSERSTACK_ACCESS_KEY: ${BROWSERSTACK_ACCESS_KEY:-}
+    TEST_BUILD_NAME: ${TEST_BUILD_NAME:-SauceDemo-${BUILD_NUMBER:-local}}
+  volumes:
+    - ${TEST_EVIDENCE_DIR:-./target}:/app/target
+    - ${TEST_REPORT_DIR:-./reports}:/app/reports
+    - ${MAVEN_CACHE_DIR:-./.m2-cache}:/root/.m2
+
+services:
+  unit-test-runner:
+    build: .
+    profiles: [ci]
+    entrypoint: ["mvn"]
+    command: ["-B", "test"]
+    environment:
+      SAUCEDEMO_TEST_PASSWORD: ${SAUCEDEMO_TEST_PASSWORD:-}
+    volumes:
+      - ${UNIT_EVIDENCE_DIR:-./ci-evidence/unit-tests}:/app/target
+      - ./ci-evidence:/app/ci-evidence
+      - ./reports:/app/reports
+      - ${MAVEN_CACHE_DIR:-./.m2-cache}:/root/.m2
+
+  selenium-hub:
+    profiles: [grid]
+    image: selenium/hub:${SELENIUM_IMAGE_TAG:-4.48.0-20260905}
+    ports:
+      - "127.0.0.1:${SELENIUM_PORT:-4444}:4444"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:4444/status > /dev/null"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  chrome:
+    profiles: [grid]
+    image: selenium/node-chrome:${SELENIUM_IMAGE_TAG:-4.48.0-20260905}
+    shm_size: 2gb
+    depends_on:
+      selenium-hub:
+        condition: service_healthy
+    environment:
+      SE_EVENT_BUS_HOST: selenium-hub
+      SE_EVENT_BUS_PUBLISH_PORT: 4442
+      SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
+      SE_NODE_MAX_SESSIONS: 1
+      SE_NODE_SESSION_TIMEOUT: 300
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:5555/status > /dev/null"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  grid-runner:
+    <<: *test-runner
+    profiles: [grid]
+    environment:
+      <<: *test-environment
+      EXECUTION_PROVIDER: grid
+    depends_on:
+      chrome:
+        condition: service_healthy
+
+  browserstack-runner:
+    <<: *test-runner
+    profiles: [browserstack]
+    environment:
+      <<: *test-environment
+      EXECUTION_PROVIDER: browserstack
+
