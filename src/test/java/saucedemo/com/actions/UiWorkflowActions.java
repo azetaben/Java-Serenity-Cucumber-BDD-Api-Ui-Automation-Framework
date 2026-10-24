@@ -1,7 +1,6 @@
 package saucedemo.com.actions;
 
-import saucedemo.com.support.FrameworkLogger;
-
+import io.cucumber.datatable.DataTable;
 import net.serenitybdd.annotations.Step;
 import net.serenitybdd.annotations.Steps;
 import net.serenitybdd.core.steps.UIInteractionSteps;
@@ -10,6 +9,7 @@ import org.openqa.selenium.By;
 import saucedemo.com.contentdesign.PageUrls;
 import saucedemo.com.pages.*;
 import saucedemo.com.properties.ApplicationConfig;
+import saucedemo.com.support.FrameworkLogger;
 
 import java.net.URI;
 import java.util.Locale;
@@ -18,6 +18,8 @@ import java.util.Map;
 public class UiWorkflowActions extends UIInteractionSteps {
     @Steps
     private LoginPage loginPage;
+    @Steps
+    private LoginActions loginActions;
     @Steps
     private CheckoutInfoPage checkoutInfoPage;
     @Steps
@@ -33,7 +35,7 @@ public class UiWorkflowActions extends UIInteractionSteps {
 
     @Step("Assert login outcome: {0}")
     public void assert_login_outcome(String outcome) {
-        FrameworkLogger.actionStarted(UiWorkflowActions.class, "assert_login_outcome");
+        FrameworkLogger.actionStarted(UiWorkflowActions.class, "Verify login outcome: " + outcome);
         String normalized = outcome.trim().toUpperCase(Locale.ROOT);
 
         switch (normalized) {
@@ -53,15 +55,15 @@ public class UiWorkflowActions extends UIInteractionSteps {
 
     @Step("Login as the default user")
     public void login_as_default_user() {
-        FrameworkLogger.actionStarted(UiWorkflowActions.class, "login_as_default_user");
-        loginPage.enterCredentials(ApplicationConfig.required("standard_user.username"),
+        FrameworkLogger.actionStarted(UiWorkflowActions.class, "Login as the default user");
+        loginActions.enter_login_credentials(ApplicationConfig.required("standard_user.username"),
                 ApplicationConfig.required("all_users.password"));
-        loginPage.submitLogin();
+        loginActions.click_login_button();
     }
 
     @Step("Assert login fields")
-    public void assert_login_fields(io.cucumber.datatable.DataTable table) {
-        FrameworkLogger.actionStarted(UiWorkflowActions.class, "assert_login_fields");
+    public void assert_login_fields(DataTable table) {
+        FrameworkLogger.actionStarted(UiWorkflowActions.class, "Verify login fields");
         for (String field : table.asList(String.class)) {
             switch (field.trim().toLowerCase(Locale.ROOT)) {
                 case "username field" -> $(loginPage.getUsernameInput()).waitUntilVisible();
@@ -72,9 +74,9 @@ public class UiWorkflowActions extends UIInteractionSteps {
         }
     }
 
-    @Step("Assert advertised users' credentials")
-    public void assert_advertised_users_credentials(io.cucumber.datatable.DataTable table) {
-        FrameworkLogger.actionStarted(UiWorkflowActions.class, "assert_advertised_users_credentials");
+    @Step("Assert accepted users' credentials")
+    public void assert_accepted_users_credentials(DataTable table) {
+        FrameworkLogger.actionStarted(UiWorkflowActions.class, "Verify accepted users' credentials");
         String displayedCredentials = $(loginPage.getCredentialsContainer()).waitUntilVisible().getText();
         for (Map<String, String> row : table.asMaps(String.class, String.class)) {
             for (String value : row.values()) {
@@ -88,40 +90,43 @@ public class UiWorkflowActions extends UIInteractionSteps {
 
     @Step("Enter configured credentials for user: {0}")
     public void enter_configured_credentials(String username) {
-        FrameworkLogger.actionStarted(UiWorkflowActions.class, "enter_configured_credentials");
-        loginPage.enterCredentials(username, ApplicationConfig.required("all_users.password"));
-        loginPage.submitLogin();
+        FrameworkLogger.actionStarted(UiWorkflowActions.class, "Enter configured credentials for user: " + username);
+        loginActions.enter_login_credentials(username, ApplicationConfig.required("all_users.password"));
+        loginActions.click_login_button();
     }
 
     @Step("Verify page: {0}")
     public void verify_page(String pageName) {
-        FrameworkLogger.actionStarted(UiWorkflowActions.class, "verify_page");
+        FrameworkLogger.actionStarted(UiWorkflowActions.class, "Verify page: " + pageName);
         String expectedPath = PageUrls.pathFor(pageName);
         waitForCondition().until(driver -> URI.create(driver.getCurrentUrl()).getPath().equals(expectedPath));
     }
 
     @Step("Assert page title: {0}")
     public void assert_page_title(String expected) {
-        FrameworkLogger.actionStarted(UiWorkflowActions.class, "assert_page_title");
+        FrameworkLogger.actionStarted(UiWorkflowActions.class, "Verify page title: " + expected);
         String actualHeading = $(navigationPage.getPageTitle()).waitUntilVisible().getText().trim();
         Assertions.assertEquals(expected, actualHeading, "Visible page heading");
     }
 
     @Step("Cancel checkout")
     public void cancel_checkout() {
-        FrameworkLogger.actionStarted(UiWorkflowActions.class, "cancel_checkout");
+        FrameworkLogger.actionStarted(UiWorkflowActions.class, "Cancel checkout");
         $(checkoutInfoPage.getCancelButton()).waitUntilClickable().click();
     }
 
     @Step("Return to inventory")
     public void return_to_inventory() {
-        FrameworkLogger.actionStarted(UiWorkflowActions.class, "return_to_inventory");
+        FrameworkLogger.actionStarted(UiWorkflowActions.class, "Return to inventory");
         $(navigationPage.getBackToProductsButton()).waitUntilClickable().click();
+        waitForCondition().until(driver -> URI.create(driver.getCurrentUrl()).getPath()
+                .equals(PageUrls.pathFor("inventory")));
+        $(inventoryPage.getInventoryList()).waitUntilVisible();
     }
 
     @Step("Submit default customer details")
     public void submit_default_customer_details() {
-        FrameworkLogger.actionStarted(UiWorkflowActions.class, "submit_default_customer_details");
+        FrameworkLogger.actionStarted(UiWorkflowActions.class, "Submit default customer details");
         $(checkoutInfoPage.getFirstNameInput()).type("Alex");
         $(checkoutInfoPage.getLastNameInput()).type("Taylor");
         $(checkoutInfoPage.getPostalCodeInput()).type("SW1A 1AA");
@@ -130,14 +135,14 @@ public class UiWorkflowActions extends UIInteractionSteps {
 
     @Step("Remove product from cart: {0}")
     public void remove_cart_product(String title) {
-        FrameworkLogger.actionStarted(UiWorkflowActions.class, "remove_cart_product");
+        FrameworkLogger.actionStarted(UiWorkflowActions.class, "Remove product from cart: " + title);
         String slug = saucedemo.com.enums.Product.from(title).getSlug();
         $(cartPage.removeButtonFor(slug)).waitUntilClickable().click();
     }
 
     @Step("Add product to details")
     public void add_product_to_details() {
-        FrameworkLogger.actionStarted(UiWorkflowActions.class, "add_product_to_details");
+        FrameworkLogger.actionStarted(UiWorkflowActions.class, "Add product to details");
         By addButton = By.cssSelector("#inventory_item_container button[data-test='add-to-cart'],"
                 + "#inventory_item_container button[id^='add-to-cart-']");
         $(addButton).waitUntilClickable().click();

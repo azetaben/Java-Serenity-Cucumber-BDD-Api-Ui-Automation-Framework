@@ -1,13 +1,12 @@
 package saucedemo.com.stepdefinitions;
 
-import saucedemo.com.support.FrameworkLogger;
-
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import net.serenitybdd.annotations.Steps;
 import saucedemo.com.actions.NavigationActions;
+import saucedemo.com.support.FrameworkLogger;
 
 /**
  * Burger-menu phrases only; shared page, login and badge bindings remain in existing classes.

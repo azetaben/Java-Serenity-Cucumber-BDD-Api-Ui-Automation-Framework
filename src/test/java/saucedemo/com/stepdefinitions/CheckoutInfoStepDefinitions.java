@@ -1,7 +1,5 @@
 package saucedemo.com.stepdefinitions;
 
-import saucedemo.com.support.FrameworkLogger;
-
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Then;
@@ -10,6 +8,7 @@ import net.serenitybdd.annotations.Steps;
 import saucedemo.com.actions.CheckoutInfoActions;
 import saucedemo.com.actions.UiWorkflowActions;
 import saucedemo.com.models.CheckoutDetails;
+import saucedemo.com.support.FrameworkLogger;
 
 public class CheckoutInfoStepDefinitions {
     @Steps

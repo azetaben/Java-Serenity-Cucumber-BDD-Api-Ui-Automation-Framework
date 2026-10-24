@@ -2,7 +2,9 @@ package saucedemo.com.support;
 
 import org.slf4j.LoggerFactory;
 
-/** Shared, parameter-free logging for framework execution boundaries. */
+/**
+ * Shared, parameter-free logging for framework execution boundaries.
+ */
 public final class FrameworkLogger {
     private FrameworkLogger() {
     }
@@ -23,6 +25,10 @@ public final class FrameworkLogger {
         log(component, "Assertion", methodName);
     }
 
+    public static void actionEnded(Class<?> component, String methodName) {
+        log(component, "Action", methodName + " ended");
+    }
+
     private static void log(Class<?> component, String layer, String methodName) {
         int sourceLine = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
                 .walk(frames -> frames
@@ -33,4 +39,6 @@ public final class FrameworkLogger {
         LoggerFactory.getLogger(component).info("Page: {} - {} started: {}",
                 sourceLine > 0 ? sourceLine : "n/a", layer, methodName);
     }
+
+
 }

@@ -1,12 +1,11 @@
 package saucedemo.com.stepdefinitions;
 
-import saucedemo.com.support.FrameworkLogger;
-
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import net.serenitybdd.annotations.Steps;
 import saucedemo.com.actions.CheckoutCompleteActions;
 import saucedemo.com.actions.OrderDocumentActions;
+import saucedemo.com.support.FrameworkLogger;
 
 public class CheckoutCompleteStepDefinitions {
     @Steps

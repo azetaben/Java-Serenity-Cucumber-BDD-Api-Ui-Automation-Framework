@@ -1,7 +1,5 @@
 package saucedemo.com.stepdefinitions;
 
-import saucedemo.com.support.FrameworkLogger;
-
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -11,6 +9,11 @@ import saucedemo.com.actions.LoginActions;
 import saucedemo.com.actions.NavigationActions;
 import saucedemo.com.actions.ScenarioSetupActions;
 import saucedemo.com.actions.UiWorkflowActions;
+import saucedemo.com.contentdesign.PageUrls;
+import saucedemo.com.support.FrameworkLogger;
+import saucedemo.com.support.GooglePasswordManager;
+
+import static net.thucydides.core.webdriver.ThucydidesWebDriverSupport.getDriver;
 
 /**
  * Shared page setup, navigation and assertions used across UI features.
@@ -26,13 +29,13 @@ public class CommonStepDefinitions {
     private UiWorkflowActions workflow;
 
     @Given("I prepare the {string} page")
-    public void iPrepareThePage(String page) {
+    public void iPrepareThePage(String page) throws InterruptedException {
         FrameworkLogger.stepDefinitionStarted(CommonStepDefinitions.class, "iPrepareThePage");
         setup.preparePage(page);
     }
 
     @Given("I am on the {string} page")
-    public void i_am_on_the_specific_page(String page) {
+    public void i_am_on_the_specific_page(String page) throws InterruptedException {
         FrameworkLogger.stepDefinitionStarted(CommonStepDefinitions.class, "i_am_on_the_specific_page");
         setup.preparePage(page);
 
@@ -42,6 +45,10 @@ public class CommonStepDefinitions {
     public void iShouldBeRedirectedToPage(String page) {
         FrameworkLogger.stepDefinitionStarted(CommonStepDefinitions.class, "iShouldBeRedirectedToPage");
         navigationActions.verify_page(page);
+        if (PageUrls.pathFor(page).equals(PageUrls.pathFor("inventory"))) {
+            GooglePasswordManager.dismissIfVisible(
+                    getDriver());
+        }
     }
 
     @Then("I should see the page header as {string}")
@@ -180,5 +187,11 @@ public class CommonStepDefinitions {
     public void iShouldBeRedirectedToThePage(String pageUrlPath) {
         FrameworkLogger.stepDefinitionStarted(CommonStepDefinitions.class, "iShouldBeRedirectedToThePage");
         navigationActions.verify_page(pageUrlPath);
+    }
+
+    @Then("I should see {int} in the shopping cart badge")
+    public void iShouldSeeInTheShoppingCartBadge(int count) {
+        FrameworkLogger.stepDefinitionStarted(CommonStepDefinitions.class, "iShouldSeeInTheShoppingCartBadge");
+        navigationActions.i_should_see_in_the_shopping_cart_badge(count);
     }
 }

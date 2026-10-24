@@ -10,18 +10,18 @@ Feature: Postcodes.io lookup and coordinate-based nearest search
     Then the lookup response status should be 200
     And the lookup response postcode should be "SW1A 1AA"
     And the lookup response should match the postcode schema:
-      | field      | type   | nullable |
-      | postcode   | string | false    |
-      | outcode    | string | false    |
-      | incode     | string | false    |
-      | country    | string | false    |
-      | region     | string | true     |
-      | quality    | number | false    |
-      | latitude   | number | true     |
-      | longitude  | number | true     |
-      | eastings   | number | true     |
-      | northings  | number | true     |
-      | codes      | object | false    |
+      | field     | type   | nullable |
+      | postcode  | string | false    |
+      | outcode   | string | false    |
+      | incode    | string | false    |
+      | country   | string | false    |
+      | region    | string | true     |
+      | quality   | number | false    |
+      | latitude  | number | true     |
+      | longitude | number | true     |
+      | eastings  | number | true     |
+      | northings | number | true     |
+      | codes     | object | false    |
     And I extract the longitude and latitude from the lookup response
     When I search for nearest postcodes using the lookup coordinates
     Then the nearest search response status should be 200
@@ -47,18 +47,18 @@ Feature: Postcodes.io lookup and coordinate-based nearest search
     When I look up postcode "SW1A 1AA"
     Then the lookup response status should be 200
     And the lookup response should match the postcode schema:
-      | field      | type   | nullable |
-      | postcode   | string | false    |
-      | outcode    | string | false    |
-      | incode     | string | false    |
-      | country    | string | false    |
-      | region     | string | true     |
-      | quality    | number | false    |
-      | latitude   | number | true     |
-      | longitude  | number | true     |
-      | eastings   | number | true     |
-      | northings  | number | true     |
-      | codes      | object | false    |
+      | field     | type   | nullable |
+      | postcode  | string | false    |
+      | outcode   | string | false    |
+      | incode    | string | false    |
+      | country   | string | false    |
+      | region    | string | true     |
+      | quality   | number | false    |
+      | latitude  | number | true     |
+      | longitude | number | true     |
+      | eastings  | number | true     |
+      | northings | number | true     |
+      | codes     | object | false    |
     And I extract the longitude and latitude from the lookup response
     When I search for the 1 nearest postcode within 1 meters using the lookup coordinates
     Then the nearest search response status should be 200

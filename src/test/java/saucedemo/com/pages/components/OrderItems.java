@@ -6,6 +6,8 @@ import saucedemo.com.models.OrderLine;
 import saucedemo.com.support.FrameworkLogger;
 
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,6 +40,15 @@ public record OrderItems(WebElementFacade container) {
         return read(row(productId));
     }
 
+    public OrderLine read(String productName) {
+        FrameworkLogger.pageOperationStarted(OrderItems.class, "read");
+        return rows().stream()
+                .filter(row -> row.find(ProductLocators.NAME).getText().trim().equals(productName.trim()))
+                .findFirst()
+                .map(OrderItems::read)
+                .orElseThrow(() -> new AssertionError("Cart does not contain product: " + productName));
+    }
+
     public String displayedPrice(int productId) {
         FrameworkLogger.pageOperationStarted(OrderItems.class, "displayedPrice");
         return row(productId).find(ProductLocators.PRICE).getText().trim();
@@ -57,4 +68,10 @@ public record OrderItems(WebElementFacade container) {
         container.waitUntilVisible();
         return container.find(ProductLocators.row(productId)).waitUntilVisible();
     }
+
+    public Collection<Object> quantities() {
+        FrameworkLogger.pageOperationStarted(OrderItems.class, "quantities");
+        return Collections.singleton(rows().stream().map(row -> Integer.parseInt(row.find(ProductLocators.QUANTITY).getText().trim())).toList());
+    }
+
 }

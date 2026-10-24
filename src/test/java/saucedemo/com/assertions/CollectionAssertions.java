@@ -1,10 +1,11 @@
 package saucedemo.com.assertions;
 
+import saucedemo.com.support.FrameworkLogger;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import saucedemo.com.support.FrameworkLogger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

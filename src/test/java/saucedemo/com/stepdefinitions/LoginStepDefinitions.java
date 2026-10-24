@@ -1,25 +1,33 @@
 package saucedemo.com.stepdefinitions;
 
-import saucedemo.com.support.FrameworkLogger;
-
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import net.serenitybdd.annotations.Steps;
+import net.thucydides.core.webdriver.ThucydidesWebDriverSupport;
+import saucedemo.com.actions.InventoryActions;
 import saucedemo.com.actions.LoginActions;
 import saucedemo.com.actions.UiWorkflowActions;
+import saucedemo.com.enums.Product;
 import saucedemo.com.enums.User;
 import saucedemo.com.enums.UserType;
 import saucedemo.com.helper.LoginPasswordResolver;
+import saucedemo.com.support.FrameworkLogger;
+import saucedemo.com.utilities.ApiSessionPreloader;
 
+import java.util.List;
 
 public class LoginStepDefinitions {
+    private final ApiSessionPreloader apiSessionPreloader = new ApiSessionPreloader();
     @Steps
     private LoginActions loginActions;
     @Steps
     private UiWorkflowActions workflow;
+    @Steps
+    private InventoryActions inventoryActions;
 
     @ParameterType("[A-Za-z0-9_ -]+")
     public User user(String value) {
@@ -27,14 +35,14 @@ public class LoginStepDefinitions {
     }
 
     @When("I login with {string} and {string}")
-    public void i_login_with_and(String username, String password) {
+    public void i_login_with_and(String username, String password) throws InterruptedException {
         FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "i_login_with_and");
         loginActions.enter_credentials(username, password);
 
     }
 
     @When("I log in as {string} using the {string} password")
-    public void i_log_in_using_password_mode(String username, String passwordMode) {
+    public void i_log_in_using_password_mode(String username, String passwordMode) throws InterruptedException {
         FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "i_log_in_using_password_mode");
         String password = LoginPasswordResolver.resolve(passwordMode,
                 () -> workflow.configured("all_users.password"));
@@ -42,9 +50,35 @@ public class LoginStepDefinitions {
     }
 
     @When("I login as accepted user")
-    public void i_login_as_accepted_user() {
+    public void i_login_as_accepted_user() throws InterruptedException {
         FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "i_login_as_accepted_user");
         workflow.login_as_default_user();
+    }
+
+    @When("I login in login as {string}")
+    @When("I preload a session via API as {string}")
+    public void i_preload_a_session_via_api_as(String username) {
+        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "I preload a session via API as " + username);
+        User user = User.fromAlias(username);
+        if (user.getExpectedLoginError().isPresent()) {
+            throw new IllegalArgumentException("Cannot preload an authenticated session for a locked user");
+        }
+        apiSessionPreloader.preloadSessionAndOpenInventory(ThucydidesWebDriverSupport.getDriver(),
+                user.getUsername());
+    }
+
+    @Given("I have {int} items in the shopping cart")
+    public void i_have_items_in_the_shopping_cart(int itemCount) {
+        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "i_have_items_in_the_shopping_cart");
+        List<Product> setupProducts = List.of(Product.BACKPACK, Product.BIKE_LIGHT, Product.BOLT_T_SHIRT, Product.FLEECE_JACKET, Product.ONESIE);
+        if (itemCount < 0 || itemCount > setupProducts.size()) {
+            throw new IllegalArgumentException("This cart setup supports between 0 and "
+                    + setupProducts.size() + " items");
+        }
+
+        apiSessionPreloader.preloadSessionAndOpenInventory(ThucydidesWebDriverSupport.getDriver(),
+                User.STANDARD_USER.getUsername());
+        setupProducts.stream().limit(itemCount).forEach(inventoryActions::add_to_cart);
     }
 
 
@@ -61,33 +95,33 @@ public class LoginStepDefinitions {
     }
 
 
-    @Then("login( users) credentials should be visible in the login form:")
+    @Then("accepted( users) credentials should be visible in the login form:")
     public void login_users_credentials_should_be_visible_in_the_login_form(DataTable table) {
         FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "login_users_credentials_should_be_visible_in_the_login_form");
-        workflow.assert_advertised_users_credentials(table);
+        workflow.assert_accepted_users_credentials(table);
     }
 
     @When("I enter the credentials for the {string} user")
-    public void i_enter_the_credentials_for_the_user(String role) {
+    public void i_enter_the_credentials_for_the_user(String role) throws InterruptedException {
         FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "i_enter_the_credentials_for_the_user");
         workflow.enter_configured_credentials(role);
     }
 
     @When("I login as an accepted \"{user}\"")
-    public void login_as(User user) {
+    public void login_as(User user) throws InterruptedException {
         FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "login_as");
         loginActions.log_in_as_account_user(user);
     }
 
     @When("I login as an accepted {string} user")
-    public void i_login_as_an_accepted_user(String alias) {
-        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "i_login_as_an_accepted_user");
+    public void i_login_as_an_accepted_user(String alias) throws InterruptedException {
+        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "I login as an accepted user");
         loginActions.login_as_alias(alias);
     }
 
     @When("I submit the login form")
-    public void i_submit_the_login_form() {
-        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "i_submit_the_login_form");
+    public void i_submit_the_login_form() throws InterruptedException {
+        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "I submit the login form");
         loginActions.click_login();
 
     }
@@ -95,14 +129,14 @@ public class LoginStepDefinitions {
     @Then("the login result should be {string}")
     @Then("I should see the login result {string}")
     public void i_should_see_the_login_result(String result) {
-        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "i_should_see_the_login_result");
+        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "I should see the login result");
         workflow.assert_login_outcome(result);
 
     }
 
     @When("I am logged into Sauce Demo with user {string}")
-    public void i_am_logged_into_sauce_demo_with_user(String username) {
-        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "i_am_logged_into_sauce_demo_with_user");
+    public void i_am_logged_into_sauce_demo_with_user(String username) throws InterruptedException {
+        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "I am logged into Sauce Demo with user");
         loginActions.open_the_sauce_demo_login_page();
         loginActions.enter_credentials(username, workflow.configured("all_users.password"));
         workflow.verify_page(saucedemo.com.contentdesign.PageNames.INVENTORY);
@@ -110,33 +144,33 @@ public class LoginStepDefinitions {
 
     @And("the shared password should be visible in the login form")
     public void the_shared_password_should_be_visible_in_the_login_form() {
-        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "the_shared_password_should_be_visible_in_the_login_form");
+        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "The shared password should be visible in the login form");
         loginActions.assert_all_user_accepted_password_visible();
 
     }
 
     @When("I attempt to log in as \"{user}\"")
-    public void i_attempt_to_log_in_as(User user) {
-        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "i_attempt_to_log_in_as");
+    public void i_attempt_to_log_in_as(User user) throws InterruptedException {
+        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "I attempt to log in as");
         loginActions.log_in_as_account_user(user);
     }
 
     @Then("the login result should match the \"{user}\" account")
     public void the_login_result_should_match_the_account(User user) {
-        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "the_login_result_should_match_the_account");
+        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "The login result should match the account");
         workflow.verify_page(user.getExpectedPage());
         user.getExpectedLoginError().ifPresent(loginActions::verify_error_msg);
     }
 
     @When("I login as accepted \"{user}\"")
-    public void i_login_as_accepted(User user) {
-        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "i_login_as_accepted");
+    public void i_login_as_accepted(User user) throws InterruptedException {
+        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "I login as accepted");
         loginActions.log_in_as_account_user(user);
     }
 
     @When("I login as an accepted user")
-    public void i_login_as_an_accepted_user() {
-        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "i_login_as_an_accepted_user");
+    public void i_login_as_an_accepted_user() throws InterruptedException {
+        FrameworkLogger.stepDefinitionStarted(LoginStepDefinitions.class, "I login as an accepted user");
         loginActions.i_login_as_user(UserType.STANDARD_USER);
 
     }

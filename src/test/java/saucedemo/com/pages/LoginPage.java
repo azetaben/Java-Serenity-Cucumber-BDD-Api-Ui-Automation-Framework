@@ -2,9 +2,11 @@ package saucedemo.com.pages;
 
 import net.serenitybdd.core.pages.PageObject;
 import org.openqa.selenium.By;
-import saucedemo.com.support.FrameworkLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoginPage extends PageObject {
+    private static final Logger log = LoggerFactory.getLogger(LoginPage.class);
 
     private final By LOGIN_CONTAINER = By.cssSelector("[data-test='login-container']");
     private final By LOGIN_LOGO = By.cssSelector(".login_logo");
@@ -72,17 +74,5 @@ public class LoginPage extends PageObject {
         return SHARED_PASSWORD;
     }
 
-    public void enterCredentials(String username, String password) {
-        FrameworkLogger.pageOperationStarted(LoginPage.class, "enterCredentials");
-        $(USERNAME_INPUT).waitUntilClickable().clear();
-        $(USERNAME_INPUT).type(username);
-        $(PASSWORD_INPUT).waitUntilClickable().clear();
-        $(PASSWORD_INPUT).type(password);
-    }
-
-    public void submitLogin() {
-        FrameworkLogger.pageOperationStarted(LoginPage.class, "submitLogin");
-        $(LOGIN_BUTTON).waitUntilClickable().click();
-    }
 
 }

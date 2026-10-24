@@ -2,7 +2,6 @@ package saucedemo.com.pages;
 
 import net.serenitybdd.core.pages.PageObject;
 import org.openqa.selenium.By;
-import saucedemo.com.pages.components.OrderItems;
 
 public class CheckoutOverviewPage extends PageObject {
 
@@ -67,7 +66,5 @@ public class CheckoutOverviewPage extends PageObject {
         return FINISH_BUTTON;
     }
 
-    public OrderItems items() {
-        return new OrderItems($(CART_LIST));
-    }
+
 }

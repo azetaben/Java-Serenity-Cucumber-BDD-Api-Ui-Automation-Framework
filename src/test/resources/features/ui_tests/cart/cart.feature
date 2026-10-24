@@ -30,11 +30,27 @@ Feature: Shopping cart
       | Sauce Labs Bike Light             |
 
     Then the cart badge should show "4"
-    When I open the cart
+    Then I should see 4 in the shopping cart badge
+    When I navigate to the shopping cart
     Then I should be redirected to "cart" page
     And the cart contains 4 products
     And I should see the following cart product details
       | name                              | quantity | price  |
+      | Sauce Labs Fleece Jacket          | 1        | $49.99 |
+      | Sauce Labs Bike Light             | 1        | $9.99  |
+      | Test.allTheThings() T-Shirt (Red) | 1        | $15.99 |
+      | Sauce Labs Bike Light             | 1        | $9.99  |
+
+
+    And I should see items details in the shopping cart
+      | Product Title                     | Quantity | $Price |
+      | Sauce Labs Fleece Jacket          | 1        | $49.99 |
+      | Sauce Labs Bike Light             | 1        | $9.99  |
+      | Test.allTheThings() T-Shirt (Red) | 1        | $15.99 |
+      | Sauce Labs Bike Light             | 1        | $9.99  |
+
+    Then I should see product items details in the shopping cart
+      | Product Title                     | Quantity | $Price |
       | Sauce Labs Fleece Jacket          | 1        | $49.99 |
       | Sauce Labs Bike Light             | 1        | $9.99  |
       | Test.allTheThings() T-Shirt (Red) | 1        | $15.99 |

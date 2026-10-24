@@ -2,7 +2,6 @@ package saucedemo.com.pages;
 
 import net.serenitybdd.core.pages.PageObject;
 import org.openqa.selenium.By;
-import saucedemo.com.support.FrameworkLogger;
 
 import java.util.Locale;
 
@@ -23,8 +22,8 @@ public class NavigationPage extends PageObject {
     private final By ABOUT_LINK = By.id("about_sidebar_link");
     private final By LOGOUT_LINK = By.id("logout_sidebar_link");
     private final By RESET_APP_STATE_LINK = By.id("reset_sidebar_link");
-    private final By SHOPPING_CART_LINK = By.cssSelector("[data-test='cart-link']");
-    private final By SHOPPING_CART_BADGE = By.cssSelector("[data-test='cart-badge']");
+    private final By SHOPPING_CART_LINK = By.cssSelector("[data-test='shopping-cart-link']");
+    private final By SHOPPING_CART_BADGE = By.cssSelector("[data-test='shopping-cart-badge']");
     private final By BACK_TO_PRODUCTS_BUTTON = By.id("back-to-products");
 
     public By getHeaderContainer() {
@@ -90,22 +89,14 @@ public class NavigationPage extends PageObject {
     public By menuLinkFor(String option) {
         String key = option.trim()
                 .toLowerCase(Locale.ROOT).replace('_', ' ').replace('-', ' ');
-        switch (key) {
-            case "inventory":
-            case "all items":
-                return ALL_ITEMS_LINK;
-            case "dynamic catalog":
-                return DYNAMIC_CATALOG_LINK;
-            case "about":
-                return ABOUT_LINK;
-            case "logout":
-                return LOGOUT_LINK;
-            case "reset":
-            case "reset app state":
-                return RESET_APP_STATE_LINK;
-            default:
-                throw new IllegalArgumentException("Unknown navigation option: " + option);
-        }
+        return switch (key) {
+            case "inventory", "all items" -> ALL_ITEMS_LINK;
+            case "dynamic catalog" -> DYNAMIC_CATALOG_LINK;
+            case "about" -> ABOUT_LINK;
+            case "logout" -> LOGOUT_LINK;
+            case "reset", "reset app state" -> RESET_APP_STATE_LINK;
+            default -> throw new IllegalArgumentException("Unknown navigation option: " + option);
+        };
     }
 
     public By getPageTitle() {
@@ -117,9 +108,9 @@ public class NavigationPage extends PageObject {
         return By.id(itemSlug + "_sidebar_link");
     }
 
-    public void openMenuButton() {
-        FrameworkLogger.pageOperationStarted(NavigationPage.class, "openMenuButton");
-        $(OPEN_MENU_BUTTON).waitUntilClickable().click();
+    public By getCartBadgeCountFor(int itemCount) {
+        return By.cssSelector("a[aria-label='Cart, " + itemCount + " items']");
     }
+
 
 }

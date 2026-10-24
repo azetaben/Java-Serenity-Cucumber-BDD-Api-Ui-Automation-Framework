@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * Small reusable HTTP client for api page objects.
- *
+ * <p>
  * All methods return the complete Rest Assured response. Callers decide which
  * status codes and response fields are expected for their endpoint/scenario.
  */

@@ -1,9 +1,10 @@
 package saucedemo.com.assertions;
 
+import saucedemo.com.support.FrameworkLogger;
+
 import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import saucedemo.com.support.FrameworkLogger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

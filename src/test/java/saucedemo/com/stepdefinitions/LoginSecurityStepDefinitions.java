@@ -1,13 +1,12 @@
 package saucedemo.com.stepdefinitions;
 
-import saucedemo.com.support.FrameworkLogger;
-
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import net.serenitybdd.annotations.Steps;
 import saucedemo.com.actions.LoginActions;
 import saucedemo.com.actions.LoginSecurityActions;
 import saucedemo.com.actions.UiWorkflowActions;
+import saucedemo.com.support.FrameworkLogger;
 
 public class LoginSecurityStepDefinitions {
     @Steps
@@ -24,7 +23,7 @@ public class LoginSecurityStepDefinitions {
     }
 
     @When("I attempt to log in as {string} with the shared password")
-    public void i_attempt_to_log_in_with_the_shared_password(String username) {
+    public void i_attempt_to_log_in_with_the_shared_password(String username) throws InterruptedException {
         FrameworkLogger.stepDefinitionStarted(LoginSecurityStepDefinitions.class, "i_attempt_to_log_in_with_the_shared_password");
         login.enter_credentials(username, workflow.configured("all_users.password"));
     }

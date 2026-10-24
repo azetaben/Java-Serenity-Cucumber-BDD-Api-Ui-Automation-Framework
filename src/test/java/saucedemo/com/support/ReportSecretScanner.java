@@ -13,13 +13,16 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
 
-/** Scans text report artifacts for configured test credentials without printing secret values. */
+/**
+ * Scans text report artifacts for configured test credentials without printing secret values.
+ */
 public final class ReportSecretScanner {
     private static final Logger log = LoggerFactory.getLogger(ReportSecretScanner.class);
     private static final Set<String> TEXT_REPORT_EXTENSIONS = Set.of(
             ".json", ".html", ".xml", ".txt", ".csv", ".properties", ".log", ".md");
 
-    private ReportSecretScanner() { }
+    private ReportSecretScanner() {
+    }
 
     public static List<Path> findLeakingFiles(Collection<Path> roots, Collection<String> secrets) throws IOException {
         List<String> needles = secrets.stream()

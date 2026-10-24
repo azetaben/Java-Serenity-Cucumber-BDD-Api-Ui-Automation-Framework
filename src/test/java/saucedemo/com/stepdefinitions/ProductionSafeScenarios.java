@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-/** Reviewed allowlist for production UI coverage. Update with feature tag changes. */
+/**
+ * Reviewed allowlist for production UI coverage. Update with feature tag changes.
+ */
 public final class ProductionSafeScenarios {
     private static final Map<String, Set<String>> ALLOWED = Map.of(
             "features/ui_tests/inventory/inventory.feature", Set.of(
@@ -15,12 +17,13 @@ public final class ProductionSafeScenarios {
             "features/ui_tests/sorting/sorting.feature", Set.of(
                     "Standard account sorts the complete catalog"));
 
-    private ProductionSafeScenarios() { }
+    private ProductionSafeScenarios() {
+    }
 
     public static boolean isAllowed(String featurePath, String scenarioName, Collection<String> tags) {
         if (featurePath == null || scenarioName == null || tags == null
                 || tags.stream().noneMatch(tag -> "@ProductionSafe".equalsIgnoreCase(tag.startsWith("@")
-                        ? tag : "@" + tag))) {
+                ? tag : "@" + tag))) {
             return false;
         }
         String normalized = featurePath.replace('\\', '/');

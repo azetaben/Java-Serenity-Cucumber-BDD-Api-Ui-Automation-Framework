@@ -6,26 +6,44 @@
     <artifactId>serenity-framework</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <name>Serenity BDD API UI Framework</name>
+    <description>SauceDemo UI and Postcodes.io API automation with Serenity BDD and Cucumber.</description>
 
     <properties>
+        <!-- Build settings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.release>17</maven.compiler.release>
+
+        <!-- Dependency versions; JUnit and Selenium modules use their BOMs. -->
         <serenity.version>4.2.9</serenity.version>
         <cucumber.version>7.20.1</cucumber.version>
         <junit.version>5.11.4</junit.version>
-        <maven.failsafe-plugin.version>3.6.0</maven.failsafe-plugin.version>
+        <!-- Match the Selenium version declared by Serenity 4.2.9. -->
+        <selenium.version>4.26.0</selenium.version>
+        <logback.version>1.6.3</logback.version>
+        <jna.version>5.17.0</jna.version>
+        <javafaker.version>1.0.2</javafaker.version>
+        <commons-csv.version>1.14.1</commons-csv.version>
+        <poi.version>5.4.1</poi.version>
+        <snakeyaml.version>2.4</snakeyaml.version>
+        <pdfbox.version>3.0.5</pdfbox.version>
+        <assertj.version>4.0.0-M1</assertj.version>
+
+        <!-- Plugin versions; Serenity's plugin shares serenity.version. -->
+        <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
-        <junit-platform-suite.version>1.11.4</junit-platform-suite.version>
-        <selenium.version>4.51.0</selenium.version>
-        <logback.version>1.6.3</logback.version>
-        <test.suite>**/CucumberTestSuite.java</test.suite>
+        <build-helper-maven-plugin.version>3.2.0</build-helper-maven-plugin.version>
+
+        <!-- Test execution and report settings -->
+        <test.suite>**/Cucumber*TestSuite.java</test.suite>
         <webdriver.base.url>https://www.saucedemo.com</webdriver.base.url>
         <tags></tags>
+        <cucumber.filter.tags>not @manual</cucumber.filter.tags>
     </properties>
     <dependencyManagement>
         <dependencies>
-            <!-- Keep all Selenium modules aligned with the installed Chrome CDP version. -->
+            <!-- Align Selenium modules; browser/driver compatibility is managed separately. -->
             <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
                 <artifactId>selenium-bom</artifactId>
@@ -76,13 +94,12 @@
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna-platform</artifactId>
-            <version>5.17.0</version>
+            <version>${jna.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-suite</artifactId>
-            <version>${junit-platform-suite.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -90,40 +107,40 @@
             <artifactId>junit-platform-launcher</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- JUnit Jupiter unit tests; versions are aligned by the JUnit BOM. -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
-            <version>1.0.2</version>
+            <version>${javafaker.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
-            <version>1.14.1</version>
+            <version>${commons-csv.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.4.1</version>
+            <version>${poi.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>2.4</version>
+            <version>${snakeyaml.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
-            <version>3.0.5</version>
+            <version>${pdfbox.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -132,13 +149,20 @@
             <version>${serenity.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- AssertJ - fluent, readable assertions -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>${build-helper-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>current-time</id>
@@ -149,7 +173,7 @@
                         <configuration>
                             <name>current.time</name>
                             <pattern>dd-MM-yyyy_HH-mm-ss</pattern>
-                            <timeZone>GMT+1</timeZone>
+                            <timeZone>UTC</timeZone>
                         </configuration>
                     </execution>
                 </executions>
@@ -166,15 +190,25 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/Cucumber*TestSuite.java</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${maven.failsafe-plugin.version}</version>
+                <version>${maven-failsafe-plugin.version}</version>
                 <configuration>
                     <includes>
                         <include>${test.suite}</include>
                     </includes>
+                    <failIfNoTests>true</failIfNoTests>
+                    <systemPropertyVariables>
+                        <cucumber.filter.tags>${cucumber.filter.tags}</cucumber.filter.tags>
+                        <webdriver.base.url>${webdriver.base.url}</webdriver.base.url>
+                    </systemPropertyVariables>
                     <argLine>-Xmx512m</argLine>
                 </configuration>
                 <executions>

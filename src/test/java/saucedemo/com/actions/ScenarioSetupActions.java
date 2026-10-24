@@ -1,17 +1,15 @@
 package saucedemo.com.actions;
 
-import saucedemo.com.support.FrameworkLogger;
-
 import net.serenitybdd.annotations.Step;
 import net.serenitybdd.annotations.Steps;
 import net.serenitybdd.core.steps.UIInteractionSteps;
 import saucedemo.com.contentdesign.PageUrls;
 import saucedemo.com.pages.*;
+import saucedemo.com.properties.ApplicationConfig;
 import saucedemo.com.properties.SauceDemoConfig;
+import saucedemo.com.support.FrameworkLogger;
 
 public class ScenarioSetupActions extends UIInteractionSteps {
-    @Steps
-    private LoginPage login;
     @Steps
     private NavigationPage navigation;
     @Steps
@@ -22,18 +20,20 @@ public class ScenarioSetupActions extends UIInteractionSteps {
     private CheckoutInfoPage checkoutInfo;
     @Steps
     private CheckoutOverviewPage overview;
+    @Steps
+    private LoginActions loginActions;
 
 
     @Step("Prepare the page for the scenario: {0}")
     public void preparePage(String pageName) {
-        FrameworkLogger.actionStarted(ScenarioSetupActions.class, "preparePage");
+        FrameworkLogger.actionStarted(ScenarioSetupActions.class, "Prepare the page for the scenario: " + pageName);
         String path = PageUrls.pathFor(pageName);
         getDriver().get(SauceDemoConfig.absoluteUrlFor("/"));
         if (!path.equals("/")) {
-            login.enterCredentials(
-                    saucedemo.com.properties.ApplicationConfig.required("standard_user.username"),
-                    saucedemo.com.properties.ApplicationConfig.required("all_users.password"));
-            login.submitLogin();
+            loginActions.enter_login_credentials(
+                    ApplicationConfig.required("standard_user.username"),
+                    ApplicationConfig.required("all_users.password"));
+            loginActions.click_login_button();
             switch (path) {
                 case "/inventory.html" -> {
                     return;

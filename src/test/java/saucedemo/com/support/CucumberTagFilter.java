@@ -2,11 +2,14 @@ package saucedemo.com.support;
 
 import java.util.Locale;
 
-/** Builds the single tag expression passed through to the Cucumber engine. */
+/**
+ * Builds the single tag expression passed through to the Cucumber engine.
+ */
 public final class CucumberTagFilter {
     private static final String DEFAULT_TAGS = "@CartPrice";
 
-    private CucumberTagFilter() { }
+    private CucumberTagFilter() {
+    }
 
     public static String effectiveExpression(String requestedTags, String targetEnvironment) {
         String environment = targetEnvironment == null ? "" : targetEnvironment.trim().toLowerCase(Locale.ROOT);

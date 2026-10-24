@@ -5,11 +5,11 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.response.Response;
 import net.serenitybdd.core.environment.WebDriverConfiguredEnvironment;
 import net.serenitybdd.model.environment.EnvironmentSpecificConfiguration;
 import org.junit.jupiter.api.Assertions;
 import saucedemo.com.api.PostcodeApi;
-import io.restassured.response.Response;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,13 +42,19 @@ public class PostcodeAPISteps {
     }
 
     @When("I look up postcode {string}")
-    public void lookupPostcodeForCoordinatesFeature(String value) { lookupPostcode(value); }
+    public void lookupPostcodeForCoordinatesFeature(String value) {
+        lookupPostcode(value);
+    }
 
     @Then("the lookup response status should be {int}")
-    public void lookupResponseStatus(int expected) { response.then().statusCode(expected); }
+    public void lookupResponseStatus(int expected) {
+        response.then().statusCode(expected);
+    }
 
     @Then("the nearest search response status should be {int}")
-    public void nearestResponseStatus(int expected) { response.then().statusCode(expected); }
+    public void nearestResponseStatus(int expected) {
+        response.then().statusCode(expected);
+    }
 
     @And("the lookup response postcode should be {string}")
     public void lookupResponsePostcode(String expected) {
@@ -105,7 +111,9 @@ public class PostcodeAPISteps {
     }
 
     @And("the nearest results should be ordered by ascending distance")
-    public void nearestResultsAscending() { verifyDistanceOrdering(); }
+    public void nearestResultsAscending() {
+        verifyDistanceOrdering();
+    }
 
     @And("the lookup response should contain an error message")
     public void lookupContainsError() {
@@ -152,7 +160,9 @@ public class PostcodeAPISteps {
     }
 
     @Then("the response status code should be {int}")
-    public void verifyStatusCode(int expected) { response.then().statusCode(expected); }
+    public void verifyStatusCode(int expected) {
+        response.then().statusCode(expected);
+    }
 
     @And("the response should contain the following fields:")
     public void verifyResponseFields(DataTable table) {
@@ -169,7 +179,9 @@ public class PostcodeAPISteps {
     }
 
     @When("I perform a bulk lookup with the following postcodes:")
-    public void bulkLookupPostcodes(List<String> values) { response = api.bulkLookup(values); }
+    public void bulkLookupPostcodes(List<String> values) {
+        response = api.bulkLookup(values);
+    }
 
     @And("all responses should be received within {int} milliseconds")
     public void verifyResponseTime(int maxMillis) {
@@ -205,7 +217,9 @@ public class PostcodeAPISteps {
     }
 
     @And("the error message should contain {string}")
-    public void verifyErrorMessage(String text) { response.then().body("error", containsString(text)); }
+    public void verifyErrorMessage(String text) {
+        response.then().body("error", containsString(text));
+    }
 
     @And("the response should include a validation error")
     public void responseIncludesValidationError() {
@@ -221,10 +235,14 @@ public class PostcodeAPISteps {
     }
 
     @And("I extract the longitude and latitude from the lookup response")
-    public void extractLookupCoordinates() { extractCoordinates(response); }
+    public void extractLookupCoordinates() {
+        extractCoordinates(response);
+    }
 
     @And("I search for nearest postcodes with its coordinates")
-    public void searchNearestWithExtractedCoordinates() { response = api.nearest(longitude, latitude, 10); }
+    public void searchNearestWithExtractedCoordinates() {
+        response = api.nearest(longitude, latitude, 10);
+    }
 
     @And("the nearest postcode should be {string}")
     public void verifyNearestPostcode(String expected) {
@@ -232,10 +250,14 @@ public class PostcodeAPISteps {
     }
 
     @When("I search for postcodes matching {string} with limit {int}")
-    public void searchPostcodes(String query, int limit) { response = api.search(query, limit); }
+    public void searchPostcodes(String query, int limit) {
+        response = api.search(query, limit);
+    }
 
     @And("the result count should be at most {int}")
-    public void resultCountAtMost(int limit) { response.then().body("result.size()", lessThanOrEqualTo(limit)); }
+    public void resultCountAtMost(int limit) {
+        response.then().body("result.size()", lessThanOrEqualTo(limit));
+    }
 
     @And("the search result should contain exactly {int} postcodes")
     public void searchResultExactly(int count) {
@@ -261,19 +283,29 @@ public class PostcodeAPISteps {
     }
 
     @When("I lookup the outcode {string}")
-    public void lookupOutcode(String outcode) { response = api.outcode(outcode); }
+    public void lookupOutcode(String outcode) {
+        response = api.outcode(outcode);
+    }
 
     @And("the outcode response should contain its outward code {string}")
-    public void verifyOutcode(String expected) { response.then().body("result.outcode", equalTo(expected)); }
+    public void verifyOutcode(String expected) {
+        response.then().body("result.outcode", equalTo(expected));
+    }
 
     @When("I request the nearest postcodes for the current postcode with limit {int}")
-    public void nearestForCurrentPostcode(int limit) { response = api.nearestForPostcode(postcode, limit); }
+    public void nearestForCurrentPostcode(int limit) {
+        response = api.nearestForPostcode(postcode, limit);
+    }
 
     @And("the nearest postcode list should contain at most {int} results")
-    public void nearestCountAtMost(int limit) { response.then().body("result.size()", lessThanOrEqualTo(limit)); }
+    public void nearestCountAtMost(int limit) {
+        response.then().body("result.size()", lessThanOrEqualTo(limit));
+    }
 
     @When("I bulk reverse geocode the current coordinates")
-    public void bulkReverseGeocode() { response = api.bulkReverse(longitude, latitude); }
+    public void bulkReverseGeocode() {
+        response = api.bulkReverse(longitude, latitude);
+    }
 
     @And("the bulk reverse result should resolve to {string}")
     public void verifyBulkReverse(String expected) {

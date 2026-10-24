@@ -1,6 +1,7 @@
 package saucedemo.com.support;
 
 import net.thucydides.core.webdriver.WebDriverFacade;
+import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.HasDownloads;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
@@ -20,7 +21,10 @@ public final class ManagedPDFDownloads {
 
     public static HasDownloads enabled(WebDriver driver) {
         WebDriver actual = driver instanceof WebDriverFacade facade ? facade.getProxiedDriver() : driver;
-        if (actual instanceof HasDownloads downloads && downloads.isDownloadsEnabled()) return downloads;
+        if (actual instanceof HasDownloads downloads && actual instanceof HasCapabilities capabilities) {
+            downloads.requireDownloadsEnabled(capabilities.getCapabilities());
+            return downloads;
+        }
         log.error("Remote WebDriver does not expose managed downloads");
         throw new IllegalStateException("Remote PDF retrieval requires se:downloadsEnabled and a managed-downloads Grid node");
     }
@@ -29,7 +33,7 @@ public final class ManagedPDFDownloads {
         log.info("Waiting for a remotely managed PDF download");
         HasDownloads downloads = enabled(driver);
         String name = new org.openqa.selenium.support.ui.FluentWait<>(downloads).withTimeout(timeout)
-                .pollingEvery(Duration.ofMillis(250)).until(current -> current.getDownloadedFiles().stream().map(HasDownloads.DownloadedFile::getName)
+                .pollingEvery(Duration.ofMillis(250)).until(current -> current.getDownloadableFiles().stream()
                         .filter(file -> file.toLowerCase(java.util.Locale.ROOT).endsWith(".pdf")).findFirst().orElse(null));
         try {
             java.nio.file.Files.createDirectories(directory);

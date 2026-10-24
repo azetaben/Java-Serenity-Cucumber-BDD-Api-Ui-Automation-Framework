@@ -6,11 +6,14 @@ import org.slf4j.LoggerFactory;
 import java.util.Locale;
 import java.util.function.Supplier;
 
-/** Resolves named password modes without placing credential values in Gherkin. */
+/**
+ * Resolves named password modes without placing credential values in Gherkin.
+ */
 public final class LoginPasswordResolver {
     private static final Logger log = LoggerFactory.getLogger(LoginPasswordResolver.class);
 
-    private LoginPasswordResolver() { }
+    private LoginPasswordResolver() {
+    }
 
     public static String resolve(String mode, Supplier<String> validPassword) {
         if (mode == null || mode.isBlank()) {

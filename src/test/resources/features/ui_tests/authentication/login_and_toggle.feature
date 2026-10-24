@@ -36,3 +36,17 @@ Feature: burger menu links
   Scenario: About link is clickable
     When I open the burger menu
     And I tap burger menu and select "About" from the burger menu list
+
+  @MenuState
+  Scenario: Opening an already open menu keeps its options visible
+    When I open the burger menu
+    And I open the burger menu
+    Then the burger menu list should contain:
+      | All Items       |
+      | About           |
+      | Logout          |
+      | Reset App State |
+    When I close the burger menu
+    And I close the burger menu
+    And I open the burger menu
+    Then the burger menu close button is displayed

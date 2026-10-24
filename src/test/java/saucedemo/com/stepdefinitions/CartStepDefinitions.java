@@ -1,7 +1,5 @@
 package saucedemo.com.stepdefinitions;
 
-import saucedemo.com.support.FrameworkLogger;
-
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -9,6 +7,10 @@ import net.serenitybdd.annotations.Steps;
 import saucedemo.com.actions.CartActions;
 import saucedemo.com.actions.UiWorkflowActions;
 import saucedemo.com.enums.Product;
+import saucedemo.com.support.FrameworkLogger;
+
+import java.util.Map;
+
 
 public class CartStepDefinitions {
     @Steps
@@ -108,4 +110,27 @@ public class CartStepDefinitions {
             cartActions.should_have_price(product, row.get("price"));
         }
     }
+
+    @Then("I should see items details in the shopping cart")
+    public void iShouldSeeItemsDetailsInTheShoppingCart(DataTable table) {
+        for (var itemDetails : table.asMaps(String.class, String.class)) {
+            Product product = Product.from(itemDetails.get("Product Title"));
+            cartActions.should_contain_product(product);
+            cartActions.should_have_quantity(product, Integer.parseInt(itemDetails.get("Quantity")));
+            cartActions.should_have_price(product, itemDetails.get("$Price"));
+        }
+    }
+
+    @Then("I should see product items details in the shopping cart")
+    public void iShouldSeeProductItemsDetailsInTheShoppingCart(DataTable table) {
+        FrameworkLogger.stepDefinitionStarted(CartStepDefinitions.class,
+                "iShouldSeeProductItemsDetailsInTheShoppingCart");
+        for (Map<String, String> item : table.asMaps(String.class, String.class)) {
+            cartActions.should_have_product_details(
+                    item.get("Product Title"),
+                    Integer.parseInt(item.get("Quantity")),
+                    item.get("$Price"));
+        }
+    }
+
 }

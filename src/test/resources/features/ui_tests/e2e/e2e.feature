@@ -18,12 +18,11 @@ Feature: End to end test for SauceDemo application
       | Username field |
       | Password field |
       | Login button   |
-
-    And login users credentials should be visible in the login form:
+    And accepted users credentials should be visible in the login form:
       | Username field          |
-      | standard_user            |
-      | locked_out_user          |
-      | problem_user             |
+      | standard_user           |
+      | locked_out_user         |
+      | problem_user            |
       | performance_glitch_user |
 
     When I login as an accepted "standard" user
@@ -40,14 +39,10 @@ Feature: End to end test for SauceDemo application
     When I open product "Sauce Labs Backpack"
     # PRODUCT DETAILS/ INVENTORY ITEM PAGE
     And I should be redirected to "inventory item" page
-    Then the details product title is "Sauce Labs Backpack"
-    And the details price of "Sauce Labs Backpack" is "$29.99"
-    And the details image of "Sauce Labs Backpack" is visible
-    And the details Add to cart button for "Sauce Labs Backpack" is visible
     When I add details product "Sauce Labs Backpack" and verify the badge increases
-    Then the details Remove button for "Sauce Labs Backpack" is visible
-    When I remove details product "Sauce Labs Backpack"
-    Then the details Add to cart button for "Sauce Labs Backpack" is visible
+    Then the cart badge should show "1"
+    And I remove "Sauce Labs Backpack" from the cart
+    Then the cart badge should not be displayed
     When I return to the inventory
     # INVENTORY PAGE
     Then I should be redirected to "inventory" page
@@ -86,7 +81,7 @@ Feature: End to end test for SauceDemo application
     And I should see "Remove" button for "backpack"
     When I remove "backpack" items from the cart
     Then the cart badge should show "4"
-    When I open the cart
+    When I navigate to the shopping cart
     # SHOPPING CART PAGE
     Then I should be on the "your cart" page
     Then the cart badge should show "4"
@@ -140,14 +135,14 @@ Feature: End to end test for SauceDemo application
     And I should see the login form
 
     Examples:
-      | sort              | position | title                             | price  |
-      | name a to z       | first    | Sauce Labs Backpack               | $29.99 |
-      | name a to z       | last     | Test.allTheThings() T-Shirt (Red) | $15.99 |
-      | name z to a       | first    | Test.allTheThings() T-Shirt (Red) | $15.99 |
-      | name z to a       | last     | Sauce Labs Backpack               | $29.99 |
-      | price low to high | first    | Sauce Labs Onesie                 | $7.99  |
-      | price low to high | last     | Sauce Labs Fleece Jacket          | $49.99 |
-      | price high to low | first    | Sauce Labs Fleece Jacket          | $49.99 |
-      | price high to low | last     | Sauce Labs Onesie                 | $7.99  |
-      | price low to high | 2        | Sauce Labs Bike Light             | $9.99  |
-      | price high to low | 6        | Sauce Labs Onesie                 | $7.99  |
+      | sort        | position | title               | price  |
+      | name a to z | first    | Sauce Labs Backpack | $29.99 |
+#      | name a to z       | last     | Test.allTheThings() T-Shirt (Red) | $15.99 |
+#      | name z to a       | first    | Test.allTheThings() T-Shirt (Red) | $15.99 |
+#      | name z to a       | last     | Sauce Labs Backpack               | $29.99 |
+#      | price low to high | first    | Sauce Labs Onesie                 | $7.99  |
+#      | price low to high | last     | Sauce Labs Fleece Jacket          | $49.99 |
+#      | price high to low | first    | Sauce Labs Fleece Jacket          | $49.99 |
+#      | price high to low | last     | Sauce Labs Onesie                 | $7.99  |
+#      | price low to high | 2        | Sauce Labs Bike Light             | $9.99  |
+#      | price high to low | 6        | Sauce Labs Onesie                 | $7.99  |

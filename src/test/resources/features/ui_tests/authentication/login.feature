@@ -17,7 +17,7 @@ Feature: Login
       | Username field |
       | Password field |
       | Login button   |
-    And login users credentials should be visible in the login form:
+    And accepted users credentials should be visible in the login form:
       | Username field          |
       | standard_user           |
       | locked_out_user         |
@@ -42,11 +42,11 @@ Feature: Login
     Then the login result should be "<result>"
 
     Examples:
-      | username                | passwordMode | result     |
-      | problem_user            | valid        | SUCCESS    |
-      | performance_glitch_user | valid        | SUCCESS    |
-      | error_user              | valid        | SUCCESS    |
-      | visual_user             | valid        | SUCCESS    |
+      | username                | passwordMode | result  |
+      | problem_user            | valid        | SUCCESS |
+      | performance_glitch_user | valid        | SUCCESS |
+      | error_user              | valid        | SUCCESS |
+      | visual_user             | valid        | SUCCESS |
 
   @Negative @Regression
   Scenario: Locked user sees the correct rejection
@@ -70,6 +70,6 @@ Feature: Login
     Then I should see the error message "Epic sadface: Username and password do not match any user in this service"
 
     Examples:
-      | username     | passwordMode |
-      | invalid_user | valid        |
+      | username      | passwordMode |
+      | invalid_user  | valid        |
       | standard_user | invalid      |

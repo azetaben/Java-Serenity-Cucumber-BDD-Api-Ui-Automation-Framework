@@ -1,7 +1,5 @@
 package saucedemo.com.stepdefinitions;
 
-import saucedemo.com.support.FrameworkLogger;
-
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
@@ -10,6 +8,7 @@ import net.serenitybdd.annotations.Steps;
 import saucedemo.com.actions.InventoryActions;
 import saucedemo.com.enums.Product;
 import saucedemo.com.models.ProductItem;
+import saucedemo.com.support.FrameworkLogger;
 
 import java.util.List;
 
@@ -67,9 +66,9 @@ public class InventoryStepDefinitions {
         inventoryActions.should_display_remove_button(Product.from(title).getSlug());
     }
 
-    @When("I remove {string} from the cart")
-    public void i_remove_from_the_cart(String title) {
-        FrameworkLogger.stepDefinitionStarted(InventoryStepDefinitions.class, "i_remove_from_the_cart");
+    @When("I remove {string}")
+    public void i_remove(String title) {
+        FrameworkLogger.stepDefinitionStarted(InventoryStepDefinitions.class, "i_remove");
         inventoryActions.remove_item_from_cart(Product.from(title).getSlug());
     }
 
@@ -175,5 +174,11 @@ public class InventoryStepDefinitions {
     public void iShouldBeRedirectedToThePage() {
         FrameworkLogger.stepDefinitionStarted(InventoryStepDefinitions.class, "iShouldBeRedirectedToThePage");
         inventoryActions.verify_on_inventory_page();
+    }
+
+    @When("I add a {string} to the cart")
+    public void iAddAToTheCart(String productTitle) {
+        FrameworkLogger.stepDefinitionStarted(InventoryStepDefinitions.class, "iAddAToTheCart");
+        inventoryActions.add_to_cart(ProductItem.fromReference(productTitle));
     }
 }

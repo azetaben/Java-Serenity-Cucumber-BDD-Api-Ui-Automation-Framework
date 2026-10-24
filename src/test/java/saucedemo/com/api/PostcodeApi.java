@@ -5,7 +5,9 @@ import io.restassured.response.Response;
 import java.util.List;
 import java.util.Map;
 
-/** api page object: owns Postcodes.io paths and HTTP requests. */
+/**
+ * api page object: owns Postcodes.io paths and HTTP requests.
+ */
 public class PostcodeApi {
     private final HttpApiClient client;
 

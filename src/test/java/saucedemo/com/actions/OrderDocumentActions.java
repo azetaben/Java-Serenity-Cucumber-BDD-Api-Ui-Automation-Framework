@@ -1,11 +1,10 @@
 package saucedemo.com.actions;
 
-import saucedemo.com.support.FrameworkLogger;
-
 import net.serenitybdd.annotations.Step;
 import net.serenitybdd.core.steps.UIInteractionSteps;
 import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.By;
+import saucedemo.com.support.FrameworkLogger;
 import saucedemo.com.support.PdfContent;
 import saucedemo.com.support.PdfDownloads;
 
@@ -19,7 +18,7 @@ public class OrderDocumentActions extends UIInteractionSteps {
 
     @Step("Download the order PDF")
     public void download_order_pdf() {
-        FrameworkLogger.actionStarted(OrderDocumentActions.class, "download_order_pdf");
+        FrameworkLogger.actionStarted(OrderDocumentActions.class, "Download the order PDF");
         Map<Path, String> state = PdfDownloads.snapshotState();
         PdfDownloads.prepareBrowserDownload(getDriver());
         $(By.id("generate-pdf-order")).waitUntilClickable().click();
@@ -28,7 +27,7 @@ public class OrderDocumentActions extends UIInteractionSteps {
 
     @Step("Verify the downloaded PDF contains the text: {0}")
     public void verify_downloaded_pdf_contains(String text) {
-        FrameworkLogger.actionStarted(OrderDocumentActions.class, "verify_downloaded_pdf_contains");
+        FrameworkLogger.actionStarted(OrderDocumentActions.class, "Verify the downloaded PDF contains the text: " + text);
         if (download == null) throw new IllegalStateException("No order PDF has been downloaded in this scenario");
         try {
             Assertions.assertTrue(PdfContent.text(download).contains(text), "Expected text in downloaded order PDF");

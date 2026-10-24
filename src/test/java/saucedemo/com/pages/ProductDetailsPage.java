@@ -49,5 +49,15 @@ public class ProductDetailsPage extends PageObject {
         return ADD_TO_CART_BUTTON;
     }
 
-    public By getBackToProductsButton() { return BACK_TO_PRODUCTS_BUTTON; }
+    public By getBackToProductsButton() {
+        return BACK_TO_PRODUCTS_BUTTON;
+    }
+
+    public By getProductQuantity() {
+        return PRODUCT_NAME;
+    }
+
+    ;
+
+
 }

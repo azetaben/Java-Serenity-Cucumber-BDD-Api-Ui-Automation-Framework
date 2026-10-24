@@ -1,7 +1,5 @@
 package saucedemo.com.actions;
 
-import saucedemo.com.support.FrameworkLogger;
-
 import net.serenitybdd.annotations.Step;
 import net.serenitybdd.annotations.Steps;
 import net.serenitybdd.core.steps.UIInteractionSteps;
@@ -14,7 +12,9 @@ import saucedemo.com.models.ProductItem;
 import saucedemo.com.pages.InventoryPage;
 import saucedemo.com.pages.ProductDetailsPage;
 import saucedemo.com.pages.components.ProductLocators;
+import saucedemo.com.support.FrameworkLogger;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class InventoryActions extends UIInteractionSteps {
@@ -25,83 +25,87 @@ public class InventoryActions extends UIInteractionSteps {
 
     @Step("Verify on inventory page")
     public void verify_on_inventory_page() {
-        FrameworkLogger.actionStarted(InventoryActions.class, "verify_on_inventory_page");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Verify on inventory page");
         waitForCondition().until(driver -> driver.getCurrentUrl().endsWith("/inventory.html"));
         $(inventoryPage.getInventoryList()).waitUntilVisible();
     }
 
     @Step("Add to cart product item: {0}")
     public void add_to_cart(ProductItem product) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "add_to_cart");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Add to cart product item: " + product);
         $(inventoryPage.addToCartButtonFor(product.slug())).waitUntilClickable().click();
     }
 
     @Step("Add to cart product: {0}")
     public void add_to_cart(Product product) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "add_to_cart");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Add to cart product: " + product);
         add_to_cart(new ProductItem(product.getId(), product.getTitle(), product.getSlug(), product.getPrice()));
     }
 
     @Step("Remove item from cart: {0}")
     public void remove_item_from_cart(String slug) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "remove_item_from_cart");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Remove item from cart: " + slug);
+        if (getDriver().getCurrentUrl().contains("/inventory-item.html")) {
+            $(productDetailsPage.getRemoveButton()).waitUntilClickable().click();
+            return;
+        }
         $(inventoryPage.removeFromCartButtonFor(slug)).waitUntilClickable().click();
     }
 
     @Step("Verify remove button is displayed for item: {0}")
     public void should_display_remove_button(String slug) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "should_display_remove_button");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Verify remove button is displayed for item: " + slug);
         $(inventoryPage.removeFromCartButtonFor(slug)).waitUntilVisible();
     }
 
     @Step("Verify add to cart button is displayed for product: {0}")
     public void should_allow_adding_to_cart(Product product) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "should_allow_adding_to_cart");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Verify add to cart button is displayed for product: " + product);
         $(inventoryPage.addToCartButtonFor(product.getSlug())).waitUntilVisible();
     }
 
     @Step("Verify the price for product: {0} is {1}")
     public void should_display_price(Product product, String expected) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "should_display_price");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Verify the price for product: " + product + " is " + expected);
         String actual = $(inventoryPage.productRowFor(product.getId())).findElement(ProductLocators.PRICE).getText();
         Assertions.assertEquals(MoneyAssertions.parseDollarAmount(expected), MoneyAssertions.parseDollarAmount(actual));
     }
 
     @Step("Verify the product image is displayed for product: {0}")
     public void should_display_product_image(Product product) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "should_display_product_image");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Verify the product image is displayed for product: " + product);
         Assertions.assertTrue($(inventoryPage.productRowFor(product.getId())).findElement(By.cssSelector("img")).isDisplayed());
     }
 
     @Step("Verify the product titles are: {0}")
     public void shouldHaveTitles(List<String> expected) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "shouldHaveTitles");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Verify the product titles are: " + expected);
         List<String> actual = findAll(ProductLocators.NAME).stream().map(element -> element.getText().trim()).toList();
         CollectionAssertions.sameTitles(expected, actual);
     }
 
     @Step("Verify the inventory has {0} items")
     public void shouldHaveCount(int expected) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "shouldHaveCount");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Verify the inventory has " + expected + " items");
         Assertions.assertEquals(expected, findAll(inventoryPage.getInventoryItems()).size());
     }
 
     @Step("Open product details for product: {0}")
     public void open_product_details_by_title(Product product) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "open_product_details_by_title");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Open product details for product: " + product);
         $(inventoryPage.productTitleFor(product.getId())).waitUntilClickable().click();
         $(productDetailsPage.getProductDetailsContainer()).waitUntilVisible();
     }
 
     @Step("Sort inventory by: {0}")
     public void sort_inventory_by(String value) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "sort_inventory_by");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Sort inventory by: " + value);
         $(inventoryPage.getSortDropdown()).selectByVisibleText(sortLabel(value));
     }
 
     @Step("Verify inventory order by field: {0} and direction: {1}")
     public void verify_inventory_order(String field, String direction) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "verify_inventory_order");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Verify inventory order by field: " + field + " and direction: " + direction);
         validateSortRequest(field, direction);
         waitForCondition().until(driver -> inventoryIsOrdered(field, direction));
         if (field.equalsIgnoreCase("price")) verify_price_order(direction);
@@ -110,15 +114,22 @@ public class InventoryActions extends UIInteractionSteps {
 
     @Step("Verify inventory price order by direction: {0}")
     public void verify_price_order(String direction) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "verify_price_order");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Verify inventory price order by direction: " + direction);
         validateSortRequest("price", direction);
         waitForCondition().until(driver -> inventoryIsOrdered("price", direction));
         assertPriceOrder(direction);
     }
 
+    public List<BigDecimal> prices() {
+        FrameworkLogger.pageOperationStarted(InventoryPage.class, "prices");
+        return findAll(inventoryPage.getProductPrice()).stream()
+                .map(element -> MoneyAssertions.parseDollarAmount(element.getText()))
+                .toList();
+    }
+
     private boolean inventoryIsOrdered(String field, String direction) {
         if (field.equalsIgnoreCase("price")) {
-            List<java.math.BigDecimal> actual = inventoryPage.prices();
+            List<java.math.BigDecimal> actual = prices();
             if (actual.isEmpty()) return false;
             List<java.math.BigDecimal> expected = new ArrayList<>(actual);
             expected.sort(Comparator.naturalOrder());
@@ -148,7 +159,7 @@ public class InventoryActions extends UIInteractionSteps {
     }
 
     private void assertPriceOrder(String direction) {
-        List<java.math.BigDecimal> actual = inventoryPage.prices();
+        List<java.math.BigDecimal> actual = prices();
         List<java.math.BigDecimal> expected = new ArrayList<>(actual);
         expected.sort(Comparator.naturalOrder());
         if (direction.equalsIgnoreCase("descending")) Collections.reverse(expected);
@@ -166,13 +177,13 @@ public class InventoryActions extends UIInteractionSteps {
 
     @Step("Verify the first item has title: {0} and price: {1}")
     public void verify_first_item(String title, String price) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "verify_first_item");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Verify the first item has title: " + title + " and price: " + price);
         verify_item_at_position("first", title, price);
     }
 
     @Step("Verify the item at position: {0} has title: {1} and price: {2}")
     public void verify_item_at_position(String position, String title, String price) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "verify_item_at_position");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Verify the item at position: " + position + " has title: " + title + " and price: " + price);
         List<net.serenitybdd.core.pages.WebElementFacade> items = findAll(inventoryPage.getInventoryItems());
         String normalizedPosition = position.trim().toLowerCase(Locale.ROOT);
         int index;
@@ -196,14 +207,14 @@ public class InventoryActions extends UIInteractionSteps {
 
     @Step("Sort and verify item with sort: {0}, position: {1}, title: {2}, and price: {3}")
     public void sort_and_verify_item(String sort, String position, String title, String price) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "sort_and_verify_item");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Sort and verify item with sort: " + sort + ", position: " + position + ", title: " + title + ", and price: " + price);
         sort_inventory_by(sort);
         verify_item_at_position(position, title, price);
     }
 
     @Step("Verify button for product: {0} with label: {1}")
     public void verify_button_for_product(String label, String slug, String title) {
-        FrameworkLogger.actionStarted(InventoryActions.class, "verify_button_for_product");
+        FrameworkLogger.actionStarted(InventoryActions.class, "Verify button for product: " + title + " with label: " + label);
         By button = label.toLowerCase(Locale.ROOT).contains("remove")
                 ? inventoryPage.removeFromCartButtonFor(slug) : inventoryPage.addToCartButtonFor(slug);
         Assertions.assertEquals(label, $(button).waitUntilVisible().getText().trim());

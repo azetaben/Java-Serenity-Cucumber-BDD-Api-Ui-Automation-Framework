@@ -1,7 +1,5 @@
 package saucedemo.com.stepdefinitions;
 
-import saucedemo.com.support.FrameworkLogger;
-
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import net.serenitybdd.annotations.Steps;
@@ -9,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import saucedemo.com.actions.CheckoutInfoActions;
 import saucedemo.com.actions.LoginActions;
+import saucedemo.com.support.FrameworkLogger;
 import saucedemo.com.utilities.TestDataGeneration;
 
 /**
@@ -30,7 +29,7 @@ public class GeneratedDataStepDefinitions {
     }
 
     @When("I log in using generated {string} credentials")
-    public void log_in_using_generated_credentials(String caseName) {
+    public void log_in_using_generated_credentials(String caseName) throws InterruptedException {
         FrameworkLogger.stepDefinitionStarted(GeneratedDataStepDefinitions.class, "log_in_using_generated_credentials");
         log.info("Log in using generated credentials case: {}", caseName);
         var account = generator().login(caseName);

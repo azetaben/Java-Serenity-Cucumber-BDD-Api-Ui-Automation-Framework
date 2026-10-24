@@ -2,12 +2,7 @@ package saucedemo.com.pages;
 
 import net.serenitybdd.core.pages.PageObject;
 import org.openqa.selenium.By;
-import saucedemo.com.assertions.MoneyAssertions;
 import saucedemo.com.pages.components.ProductLocators;
-import saucedemo.com.support.FrameworkLogger;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 
 public class InventoryPage extends PageObject {
@@ -75,10 +70,4 @@ public class InventoryPage extends PageObject {
         return ProductLocators.title(productId);
     }
 
-    public List<BigDecimal> prices() {
-        FrameworkLogger.pageOperationStarted(InventoryPage.class, "prices");
-        return findAll(PRODUCT_PRICE).stream()
-                .map(element -> MoneyAssertions.parseDollarAmount(element.getText()))
-                .toList();
-    }
 }

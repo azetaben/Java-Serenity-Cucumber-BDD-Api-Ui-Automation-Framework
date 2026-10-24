@@ -1,7 +1,7 @@
 @UI @ProductDetails @Positive
 Feature: Should be able to navigate to product details page,
-          add and remove products from the cart,
-          and logout
+  add and remove products from the cart,
+  and logout
 
   Scenario: Add, remove a product and logout
     Given I open the browser on the SauceDemo page
