@@ -1,7 +1,9 @@
 # SauceDemo Serenity BDD API and UI Automation Framework
 
 Java 17 automation for SauceDemo browser workflows and the Postcodes.io API, using Serenity BDD, Selenium, Cucumber, and
-JUnit 5.
+JUnit 6.
+
+Assertions use AssertJ throughout the framework. JUnit Jupiter remains responsible for test annotations and execution.
 
 ## Requirements
 
@@ -10,7 +12,7 @@ JUnit 5.
 - Network access to the applications and Maven repositories.
 - Docker with Compose v2 for container runs, and BrowserStack credentials for that provider.
 
-Versions are maintained in `pom.xml`: Serenity 4.2.9, Cucumber 7.20.1, JUnit 5.11.4, Selenium 4.26.0, and
+Versions are maintained in `pom.xml`: Serenity 5.4.1, Cucumber 8.0.4, JUnit 6.1.3, Selenium 4.51.0, and
 Surefire/Failsafe 3.5.4.
 
 ## Getting started
@@ -57,7 +59,7 @@ mvn clean verify "-Dcucumber.filter.tags=(@Smoke or @Regression) and not @manual
 Direct Maven runs default to `not @manual`. An explicit expression replaces that default; include `and not @manual` when
 appropriate. The separate `tags` property filters Serenity report aggregation, not Cucumber execution.
 
-Suite classes declare feature paths and glue. `cucumber.properties` registers the Serenity reporter.
+Suite classes declare feature paths and glue. `cucumber.properties` configures the same glue package for direct Cucumber CLI runs and registers the Serenity reporter.
 `junit-platform.properties` enables four Cucumber workers. Disable parallel execution when debugging or using a single
 Grid slot:
 
@@ -72,7 +74,7 @@ report aggregation.
 
 `serenity.properties` owns reporting and browser lifecycle settings. `src/test/resources/serenity.conf` owns browser
 profiles, application content, endpoints, and timeouts. Capability values are explicit in each profile because Serenity
-4.2.9 selects whole capability objects. Selenium is aligned with the version declared by Serenity to avoid
+selects whole capability objects. Selenium is aligned with the version declared by Serenity to avoid
 capability-loader linkage errors. Pass `-Dheadless.mode=true` explicitly for headless runs. Use `-Denvironment=chrome`,
 `firefox`, `edge`, or `safari` for a local browser, or an existing remote provider profile such as `grid` or
 `browserstack`. The separate `test.environment` property labels the application deployment and activates production
@@ -141,16 +143,15 @@ stores.
 
 ### Waiting for Google Password Manager after login
 
-The opt-in `@PasswordManagerPrompt` scenario allows the native Chrome prompt and waits up to 20 seconds after a
+The opt-in `@PasswordManagerPrompt` scenario allows the native Chrome prompt and waits up to 5 seconds after a
 successful UI login. Run on an interactive Windows desktop with English Chrome and Windows PowerShell:
 
 ```powershell
-mvn clean verify "-Dtest.suite=**/CucumberUITestSuite.java" "-Denvironment=chrome-password-manager" "-Dheadless.mode=false" "-Dcucumber.filter.tags=@PasswordManagerPrompt" "-Dcucumber.execution.parallel.enabled=false"
+mvn clean verify -Ppassword-manager
 ```
 
 The `chrome-password-manager` profile enables password saving/leak detection and omits Incognito and suppression flags.
-Normal Chrome profiles continue suppressing prompts. The desktop scenario skips unless its observation profile is
-enabled; it fails if the prompt does not appear before the deadline. Chrome decides whether to display a prompt, so
+Normal Chrome profiles continue suppressing prompts. The desktop scenario has its own runner under `features/desktop_native_tests`, selected only by `-Ppassword-manager`; it fails if the prompt does not appear before the deadline. Chrome decides whether to display a prompt, so
 browser policy, version, and account state can affect the result.
 
 The wait uses Windows UI Automation against the local Chrome process reported by ChromeDriver. It excludes website
@@ -160,6 +161,17 @@ in the observation scenario. The shared `I should be redirected to "inventory" p
 seconds, then dismisses a recognized native prompt if present. That dismissal is supported on local Windows Chrome and
 is a no-op for other browser/provider combinations. This is a native UI wait, not a Selenium alert or page-element wait.
 Restart Chrome when switching profiles.
+
+## Appium mobile automation
+
+Android Chrome, iOS Safari, and native-app session smoke tests are available through opt-in Appium profiles. The Java client is pinned at 11.0.0 to match Serenity 5.4.1 and Selenium 4.51.0. Desktop and API execution remains the default.
+
+```powershell
+$env:APPIUM_UDID = 'emulator-5554'
+mvn clean verify -Pmobile-web "-Denvironment=android-web"
+```
+
+Start Appium and the emulator/device first. See [mobile setup and execution](docs/mobile-testing.md) for the server/driver versions, Android/iOS profiles, native app configuration, and CI requirements. Device runs have not been verified without an Appium server and configured device.
 
 ## Docker Compose
 
@@ -213,8 +225,7 @@ Jenkins separates reports under `reports/<provider>/` and evidence under `ci-evi
 `target`, so `mvn clean` preserves earlier HTML reports.
 
 After an IDE run, generate HTML with `mvn serenity:aggregate`; standalone aggregation uses Serenity's configured output
-directory. Logging uses SLF4J and `logback-test.xml`. `FrameworkLogger` records execution context without method
-parameters. `ReportSecretScanner` checks text artifacts for configured and public demo passwords.
+directory. Logging uses SLF4J and `logback-test.xml`. Action classes use their own SLF4J `log.info(...)` calls with `{}` placeholders. `FrameworkLogger` remains for step-definition, page, and assertion boundaries. `ReportSecretScanner` checks text artifacts for configured and public demo passwords.
 
 ## Project layout
 

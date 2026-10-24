@@ -1,5 +1,6 @@
 package saucedemo.com.support;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -26,19 +27,34 @@ public final class FrameworkLogger {
     }
 
     public static void actionEnded(Class<?> component, String methodName) {
-        log(component, "Action", methodName + " ended");
+        log(LoggerFactory.getLogger(component), component, "Action", "ended", methodName);
     }
 
-    private static void log(Class<?> component, String layer, String methodName) {
+    /** Emit through the action's own logger while retaining its source-line context. */
+    public static void actionStarted(Logger logger, Class<?> component, String description) {
+        log(logger, component, "Action", "started", description);
+    }
+
+    public static void pageOperationStarted(Logger logger, Class<?> component, String description) {
+        log(logger, component, "Page operation", "started", description);
+    }
+
+    public static void actionEnded(Logger logger, Class<?> component, String description) {
+        log(logger, component, "Action", "ended", description);
+    }
+
+    private static void log(Class<?> component, String layer, String description) {
+        log(LoggerFactory.getLogger(component), component, layer, "started", description);
+    }
+
+    private static void log(Logger logger, Class<?> component, String layer, String event, String description) {
         int sourceLine = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
                 .walk(frames -> frames
                         .filter(frame -> frame.getDeclaringClass() == component)
                         .mapToInt(StackWalker.StackFrame::getLineNumber)
                         .findFirst()
                         .orElse(-1));
-        LoggerFactory.getLogger(component).info("Page: {} - {} started: {}",
-                sourceLine > 0 ? sourceLine : "n/a", layer, methodName);
+        logger.info("Page: {} - {} {}: {}",
+                sourceLine > 0 ? sourceLine : "n/a", layer, event, description);
     }
-
-
 }

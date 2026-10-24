@@ -52,3 +52,7 @@ src/test/java/nhsbsa/pensions/mcp/webdriver/windows/*
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+*.apk
+*.aab
+*.ipa
+*.app/

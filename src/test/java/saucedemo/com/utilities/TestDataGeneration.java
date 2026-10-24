@@ -94,7 +94,7 @@ public final class TestDataGeneration {
 
     private String unknownUsername() {
         List<String> accepted = java.util.Arrays.stream(saucedemo.com.enums.User.values())
-                .map(saucedemo.com.enums.User::getUsername).toList();
+                .map(saucedemo.com.enums.User::getStandardUser).toList();
         String value;
         do {
             value = "invalid_" + faker.number().digits(12);

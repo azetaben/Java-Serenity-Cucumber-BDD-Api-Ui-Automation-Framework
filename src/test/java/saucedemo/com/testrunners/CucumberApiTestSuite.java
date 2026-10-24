@@ -11,6 +11,6 @@ import org.junit.platform.suite.api.Suite;
 @SelectClasspathResource("features/api_tests")
 @ConfigurationParameter(key = Constants.GLUE_PROPERTY_NAME, value = "saucedemo.com.stepdefinitions")
 @ConfigurationParameter(key = Constants.PLUGIN_PROPERTY_NAME,
-        value = "io.cucumber.core.plugin.SerenityReporterParallel")
+        value = "net.serenitybdd.cucumber.core.plugin.SerenityReporterParallel")
 public class CucumberApiTestSuite {
 }

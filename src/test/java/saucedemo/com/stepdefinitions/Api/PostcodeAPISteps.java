@@ -8,14 +8,13 @@ import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 import net.serenitybdd.core.environment.WebDriverConfiguredEnvironment;
 import net.serenitybdd.model.environment.EnvironmentSpecificConfiguration;
-import org.junit.jupiter.api.Assertions;
 import saucedemo.com.api.PostcodeApi;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 
 public class PostcodeAPISteps {
@@ -64,8 +63,8 @@ public class PostcodeAPISteps {
     @And("the lookup response should contain valid longitude and latitude")
     public void lookupHasCoordinates() {
         extractCoordinates(response);
-        Assertions.assertTrue(longitude >= -180 && longitude <= 180, "Longitude is outside WGS84 range");
-        Assertions.assertTrue(latitude >= -90 && latitude <= 90, "Latitude is outside WGS84 range");
+        assertThat(longitude >= -180 && longitude <= 180).as("Longitude is outside WGS84 range").isTrue();
+        assertThat(latitude >= -90 && latitude <= 90).as("Latitude is outside WGS84 range").isTrue();
         coordinatesAvailable = true;
     }
 
@@ -73,7 +72,7 @@ public class PostcodeAPISteps {
     public void lookupResponseMatchesPostcodeSchema(DataTable schemaTable) {
         response.then().contentType("application/json").statusCode(200).body("status", equalTo(200));
         Map<String, Object> result = response.jsonPath().getMap("result");
-        Assertions.assertNotNull(result, "Lookup result must be a JSON object");
+        assertThat((Object) result).as("Lookup result must be a JSON object").isNotNull();
         validateSchemaFields(result, schemaTable);
     }
 
@@ -81,8 +80,8 @@ public class PostcodeAPISteps {
     public void nearestResponseMatchesPostcodeSchema() {
         response.then().contentType("application/json").statusCode(200).body("status", equalTo(200));
         List<Map<String, Object>> results = response.jsonPath().getList("result");
-        Assertions.assertNotNull(results, "Nearest result must be a JSON array");
-        Assertions.assertFalse(results.isEmpty(), "Nearest search must return at least one result");
+        assertThat((Object) results).as("Nearest result must be a JSON array").isNotNull();
+        assertThat(results.isEmpty()).as("Nearest search must return at least one result").isFalse();
         for (Map<String, Object> result : results) {
             assertStringField(result, "postcode", false);
             assertStringField(result, "outcode", false);
@@ -95,13 +94,13 @@ public class PostcodeAPISteps {
             assertNumberField(result, "eastings", false);
             assertNumberField(result, "northings", false);
             assertNumberField(result, "distance", true);
-            Assertions.assertInstanceOf(Map.class, result.get("codes"), "codes must be a JSON object");
+            assertThat((Object) result.get("codes")).as("codes must be a JSON object").isInstanceOf(Map.class);
         }
     }
 
     @When("I search for nearest postcodes using the lookup coordinates")
     public void nearestUsingLookupCoordinates() {
-        Assertions.assertTrue(coordinatesAvailable, "Cannot search nearest postcodes without lookup coordinates");
+        assertThat(coordinatesAvailable).as("Cannot search nearest postcodes without lookup coordinates").isTrue();
         response = api.nearest(longitude, latitude, 10);
     }
 
@@ -118,20 +117,20 @@ public class PostcodeAPISteps {
     @And("the lookup response should contain an error message")
     public void lookupContainsError() {
         String error = response.jsonPath().getString("error");
-        Assertions.assertNotNull(error, "Error response should include an error message");
-        Assertions.assertFalse(error.isBlank(), "Error message should not be blank");
+        assertThat((Object) error).as("Error response should include an error message").isNotNull();
+        assertThat(error.isBlank()).as("Error message should not be blank").isFalse();
     }
 
     @And("no coordinates should be available for the nearest search")
     public void noCoordinatesAvailable() {
-        Assertions.assertFalse(coordinatesAvailable, "Invalid lookup must not provide coordinates");
-        Assertions.assertNull(response.jsonPath().get("result.latitude"), "Invalid postcode must not have latitude");
-        Assertions.assertNull(response.jsonPath().get("result.longitude"), "Invalid postcode must not have longitude");
+        assertThat(coordinatesAvailable).as("Invalid lookup must not provide coordinates").isFalse();
+        assertThat((Object) response.jsonPath().get("result.latitude")).as("Invalid postcode must not have latitude").isNull();
+        assertThat((Object) response.jsonPath().get("result.longitude")).as("Invalid postcode must not have longitude").isNull();
     }
 
     @When("I search for the {int} nearest postcode within {int} meters using the lookup coordinates")
     public void nearestWithLimitAndRadius(int limit, int radius) {
-        Assertions.assertTrue(coordinatesAvailable, "Cannot search nearest postcodes without lookup coordinates");
+        assertThat(coordinatesAvailable).as("Cannot search nearest postcodes without lookup coordinates").isTrue();
         response = api.nearest(longitude, latitude, limit, radius);
     }
 
@@ -148,9 +147,8 @@ public class PostcodeAPISteps {
     @And("the first nearest result should be within {int} meters")
     public void firstNearestWithinDistance(int maxDistance) {
         Number distance = response.jsonPath().get("result[0].distance");
-        Assertions.assertNotNull(distance, "Nearest result must include distance");
-        Assertions.assertTrue(distance.doubleValue() <= maxDistance,
-                "Nearest result is outside the requested " + maxDistance + " meter radius");
+        assertThat((Object) distance).as("Nearest result must include distance").isNotNull();
+        assertThat(distance.doubleValue() <= maxDistance).as("Nearest result is outside the requested " + maxDistance + " meter radius").isTrue();
     }
 
     @When("I request nearest postcodes for postcode {string} with limit {int}")
@@ -174,8 +172,8 @@ public class PostcodeAPISteps {
     public void verifyCoordinateBoundaries() {
         double lat = response.jsonPath().getDouble("result.latitude");
         double lon = response.jsonPath().getDouble("result.longitude");
-        Assertions.assertTrue(lat > 49.8 && lat < 60.9, "Latitude outside UK bounds");
-        Assertions.assertTrue(lon > -8.74 && lon < 1.96, "Longitude outside UK bounds");
+        assertThat(lat > 49.8 && lat < 60.9).as("Latitude outside UK bounds").isTrue();
+        assertThat(lon > -8.74 && lon < 1.96).as("Longitude outside UK bounds").isTrue();
     }
 
     @When("I perform a bulk lookup with the following postcodes:")
@@ -185,8 +183,7 @@ public class PostcodeAPISteps {
 
     @And("all responses should be received within {int} milliseconds")
     public void verifyResponseTime(int maxMillis) {
-        Assertions.assertTrue(response.getTime() < maxMillis,
-                "api response took " + response.getTime() + " ms; limit is " + maxMillis + " ms");
+        assertThat(response.getTime() < maxMillis).as("api response took " + response.getTime() + " ms; limit is " + maxMillis + " ms").isTrue();
     }
 
     @And("each postcode result should contain required fields")
@@ -213,7 +210,7 @@ public class PostcodeAPISteps {
     public void verifyDistanceOrdering() {
         List<Float> distances = response.jsonPath().getList("result.distance", Float.class);
         for (int i = 1; i < distances.size(); i++)
-            Assertions.assertTrue(distances.get(i - 1) <= distances.get(i), "Results not ordered by distance");
+            assertThat(distances.get(i - 1) <= distances.get(i)).as("Results not ordered by distance").isTrue();
     }
 
     @And("the error message should contain {string}")
@@ -224,8 +221,8 @@ public class PostcodeAPISteps {
     @And("the response should include a validation error")
     public void responseIncludesValidationError() {
         String error = response.jsonPath().getString("error");
-        Assertions.assertNotNull(error, "Validation response should include an error message");
-        Assertions.assertFalse(error.isBlank(), "Validation error should not be blank");
+        assertThat((Object) error).as("Validation response should include an error message").isNotNull();
+        assertThat(error.isBlank()).as("Validation error should not be blank").isFalse();
     }
 
     @Then("verify administrative hierarchy:")
@@ -263,17 +260,16 @@ public class PostcodeAPISteps {
     public void searchResultExactly(int count) {
         Object result = response.jsonPath().get("result");
         if (count == 0) {
-            Assertions.assertTrue(result == null || (result instanceof List<?> results && results.isEmpty()),
-                    "Expected no postcode matches, but the api returned: " + result);
+            assertThat(result == null || (result instanceof List<?> results && results.isEmpty())).as("Expected no postcode matches, but the api returned: " + result).isTrue();
             return;
         }
-        Assertions.assertInstanceOf(List.class, result, "Search result must be a JSON array");
-        Assertions.assertEquals(count, ((List<?>) result).size(), "Unexpected number of postcode matches");
+        assertThat((Object) result).as("Search result must be a JSON array").isInstanceOf(List.class);
+        assertThat(((List<?>) result).size()).as("Unexpected number of postcode matches").isEqualTo(count);
     }
 
     @When("I perform a bulk lookup with {int} copies of postcode {string}")
     public void bulkLookupRepeatedPostcodes(int count, String value) {
-        Assertions.assertTrue(count >= 1 && count <= 100, "Bulk lookup count must be between 1 and 100");
+        assertThat(count >= 1 && count <= 100).as("Bulk lookup count must be between 1 and 100").isTrue();
         response = api.bulkLookup(Collections.nCopies(count, value));
     }
 
@@ -328,8 +324,8 @@ public class PostcodeAPISteps {
     private void extractCoordinates(Response from) {
         Number lat = from.jsonPath().get("result.latitude");
         Number lon = from.jsonPath().get("result.longitude");
-        Assertions.assertNotNull(lat, "Lookup latitude was null");
-        Assertions.assertNotNull(lon, "Lookup longitude was null");
+        assertThat((Object) lat).as("Lookup latitude was null").isNotNull();
+        assertThat((Object) lon).as("Lookup longitude was null").isNotNull();
         latitude = lat.doubleValue();
         longitude = lon.doubleValue();
         coordinatesAvailable = true;
@@ -338,15 +334,15 @@ public class PostcodeAPISteps {
     private void assertStringField(Map<String, Object> object, String field, boolean nullable) {
         Object value = object.get(field);
         if (nullable && value == null) return;
-        Assertions.assertInstanceOf(String.class, value, field + " must be a string" + (nullable ? " or null" : ""));
+        assertThat((Object) value).as(field + " must be a string" + (nullable ? " or null" : "")).isInstanceOf(String.class);
         String text = (String) value;
-        Assertions.assertFalse(text.isBlank(), field + " must not be blank");
+        assertThat(text.isBlank()).as(field + " must not be blank").isFalse();
     }
 
     private void assertNumberField(Map<String, Object> object, String field, boolean nullable) {
         Object value = object.get(field);
         if (nullable && value == null) return;
-        Assertions.assertInstanceOf(Number.class, value, field + " must be numeric" + (nullable ? " or null" : ""));
+        assertThat((Object) value).as(field + " must be numeric" + (nullable ? " or null" : "")).isInstanceOf(Number.class);
     }
 
     private void validateSchemaFields(Map<String, Object> object, DataTable schemaTable) {
@@ -360,7 +356,7 @@ public class PostcodeAPISteps {
                 case "object" -> {
                     Object value = object.get(field);
                     if (nullable && value == null) break;
-                    Assertions.assertInstanceOf(Map.class, value, field + " must be a JSON object" + (nullable ? " or null" : ""));
+                    assertThat((Object) value).as(field + " must be a JSON object" + (nullable ? " or null" : "")).isInstanceOf(Map.class);
                 }
                 default -> throw new IllegalArgumentException("Unsupported schema type: " + type);
             }

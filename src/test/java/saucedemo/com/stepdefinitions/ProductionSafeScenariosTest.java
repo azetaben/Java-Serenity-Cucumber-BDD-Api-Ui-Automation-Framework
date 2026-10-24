@@ -1,7 +1,6 @@
 package saucedemo.com.stepdefinitions;
 
 import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -9,36 +8,35 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ProductionSafeScenariosTest {
     private static final String INVENTORY = "classpath:features/ui_tests/inventory/inventory.feature";
 
     @Test
     void allowsOnlyReviewedScenariosWithProductionSafeTag() {
-        assertTrue(ProductionSafeScenarios.isAllowed(INVENTORY, "Verify the product titles", Set.of("@UI", "@ProductionSafe")));
-        assertFalse(ProductionSafeScenarios.isAllowed(INVENTORY, "Add and remove a product", Set.of("@ProductionSafe")));
-        assertFalse(ProductionSafeScenarios.isAllowed(INVENTORY, "Verify the product titles", Set.of("@UI")));
+        assertThat(ProductionSafeScenarios.isAllowed(INVENTORY, "Verify the product titles", Set.of("@UI", "@ProductionSafe"))).isTrue();
+        assertThat(ProductionSafeScenarios.isAllowed(INVENTORY, "Add and remove a product", Set.of("@ProductionSafe"))).isFalse();
+        assertThat(ProductionSafeScenarios.isAllowed(INVENTORY, "Verify the product titles", Set.of("@UI"))).isFalse();
     }
 
     @Test
     void rejectsDuplicateNamesFromUnreviewedFeatures() {
-        assertFalse(ProductionSafeScenarios.isAllowed("features/ui_tests/other/inventory.feature",
-                "Verify the product titles", Set.of("@ProductionSafe")));
+        assertThat(ProductionSafeScenarios.isAllowed("features/ui_tests/other/inventory.feature",
+                "Verify the product titles", Set.of("@ProductionSafe"))).isFalse();
     }
 
     @Test
     void acceptsCucumberClasspathUris() {
-        assertTrue(ProductionSafeScenarios.isAllowed(
+        assertThat(ProductionSafeScenarios.isAllowed(
                 URI.create("classpath:features/ui_tests/inventory/inventory.feature"),
-                "Verify the product titles", Set.of("@ProductionSafe")));
+                "Verify the product titles", Set.of("@ProductionSafe"))).isTrue();
     }
 
     @Test
     void exposesTheReviewedAllowlistForGovernance() {
-        assertEquals(Set.of("Verify the product titles", "Verify product prices and images", "Open a product"),
-                ProductionSafeScenarios.reviewedAllowlist().get("features/ui_tests/inventory/inventory.feature"));
-        assertEquals(2, ProductionSafeScenarios.reviewedAllowlist().size());
+        assertThat(ProductionSafeScenarios.reviewedAllowlist().get("features/ui_tests/inventory/inventory.feature")).isEqualTo(Set.of("Verify the product titles", "Verify product prices and images", "Open a product"));
+        assertThat(ProductionSafeScenarios.reviewedAllowlist().size()).isEqualTo(2);
     }
 
     @Test
@@ -77,7 +75,6 @@ class ProductionSafeScenariosTest {
                 }
             }
         }
-        assertEquals(ProductionSafeScenarios.reviewedAllowlist(), taggedFeatures,
-                "Update the production allowlist and this test together when @ProductionSafe coverage changes");
+        assertThat(taggedFeatures).as("Update the production allowlist and this test together when @ProductionSafe coverage changes").isEqualTo(ProductionSafeScenarios.reviewedAllowlist());
     }
 }

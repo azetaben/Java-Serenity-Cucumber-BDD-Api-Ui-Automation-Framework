@@ -8,7 +8,6 @@ Feature: End to end test for SauceDemo application
 
   @Special_Regression
   Scenario Outline: Add a product item to the cart
-    # LOGIN/ HOME PAGE
     Given I prepare the "login" page
     And the page title should be "Swag Labs"
     And the logo should be displayed
@@ -26,25 +25,20 @@ Feature: End to end test for SauceDemo application
       | performance_glitch_user |
 
     When I login as an accepted "standard" user
-    # INVENTORY PAGE
     And I should be redirected to "inventory" page
     Then I should be on the "products" page
     And I should see the page header as "Products"
     And the shopping cart badge should not be visible
     When I sort the inventory by "price low to high"
     Then the first inventory item should be "Sauce Labs Onesie" priced at "$7.99"
-    #      Verify a product after sorting
     Then I sort the inventory by "<sort>" the "<position>" inventory item should be "<title>" priced at "<price>"
-
     When I open product "Sauce Labs Backpack"
-    # PRODUCT DETAILS/ INVENTORY ITEM PAGE
     And I should be redirected to "inventory item" page
     When I add details product "Sauce Labs Backpack" and verify the badge increases
     Then the cart badge should show "1"
     And I remove "Sauce Labs Backpack" from the cart
     Then the cart badge should not be displayed
     When I return to the inventory
-    # INVENTORY PAGE
     Then I should be redirected to "inventory" page
     When I add "backpack" items to the cart
     When I add product items to the cart:
@@ -53,7 +47,6 @@ Feature: End to end test for SauceDemo application
     And I should see "Remove" button for "backpack"
     Then the cart badge should show "3"
     And I navigate to the shopping cart
-    # SHOPPING CART PAGE
     Then I should be on the "your cart" page
     And these cart product titles are displayed with Remove buttons:
       | Sauce Labs Backpack      |
@@ -66,7 +59,6 @@ Feature: End to end test for SauceDemo application
       | Sauce Labs Onesie        | 1        | $7.99  |
 
     And I continue shopping
-    # INVENTORY PAGE
     Then I should be on the "products" page
     And I can see the page header as "Products"
     And I should see "Remove" button for "backpack"
@@ -82,7 +74,6 @@ Feature: End to end test for SauceDemo application
     When I remove "backpack" items from the cart
     Then the cart badge should show "4"
     When I navigate to the shopping cart
-    # SHOPPING CART PAGE
     Then I should be on the "your cart" page
     Then the cart badge should show "4"
     And these cart product titles are displayed with Remove buttons:
@@ -91,17 +82,12 @@ Feature: End to end test for SauceDemo application
       | Sauce Labs Onesie                 |
       | Test.allTheThings() T-Shirt (Red) |
     When I proceed to checkout
-    # CHECKOUT INFORMATION PAGE
     Then I should be redirected to "checkout information" page
     When I enter checkout information below:
       | firstName | lastName | postalCode |
       | John      | Doe      | M2 5JJ     |
-    And I continue from checkout information
-#    And I submit checkout information
-
-    # CHECKOUT OVERVIEW PAGE
+    And I submit checkout information
     Then I should be redirected to "checkout overview" page
-
     Then the order summary should contain exactly these products:
       | product                           | quantity | unitPrice |
       | Sauce Labs Bolt T-Shirt           | 1        | $15.99    |
@@ -114,14 +100,13 @@ Feature: End to end test for SauceDemo application
     And the displayed tax should equal the configured tax rate applied to the item subtotal
     And the displayed total should equal the item subtotal plus tax
     And I finish checkout
-    # CHECKOUT COMPLETE PAGE
     Then I should be redirected to "checkout complete" page
     Then the Pony Express icon is visible
     And I should see the checkout confirmation "Thank you for your order!"
     And the order dispatch message is visible
     And the Back Home button is displayed
     When I return to the inventory
-    # NAVIGATION PAGE
+    Then I should be redirected to "inventory" page
     When I open the burger menu
     Then the burger menu list should contain:
       | All Items       |

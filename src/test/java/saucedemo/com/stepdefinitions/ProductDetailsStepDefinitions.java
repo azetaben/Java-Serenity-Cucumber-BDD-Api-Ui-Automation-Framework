@@ -7,7 +7,6 @@ import io.cucumber.java.en.When;
 import net.serenitybdd.annotations.Steps;
 import saucedemo.com.actions.ProductDetailsActions;
 import saucedemo.com.actions.UiWorkflowActions;
-import saucedemo.com.support.FrameworkLogger;
 
 import java.util.Map;
 
@@ -20,13 +19,11 @@ public class ProductDetailsStepDefinitions {
 
     @Then("the product title should be {string}")
     public void the_product_title_should_be(String title) {
-        FrameworkLogger.stepDefinitionStarted(ProductDetailsStepDefinitions.class, "the_product_title_should_be");
         productDetailsActions.should_display_product_name(title);
     }
 
     @Then("the price for {string} should be {string}")
     public void the_price_for_should_be(String title, String price) {
-        FrameworkLogger.stepDefinitionStarted(ProductDetailsStepDefinitions.class, "the_price_for_should_be");
         productDetailsActions.should_display_product_name(title);
         productDetailsActions.should_display_price(price);
     }
@@ -42,61 +39,52 @@ public class ProductDetailsStepDefinitions {
 
     @Then("the product image for {string} should be visible")
     public void the_product_image_for_should_be_visible(String title) {
-        FrameworkLogger.stepDefinitionStarted(ProductDetailsStepDefinitions.class, "the_product_image_for_should_be_visible");
         productDetailsActions.should_have_product_image_alt_text(title);
         productDetailsActions.should_display_product_image();
     }
 
     @Then("the Add to cart button for {string} should be visible")
     public void the_add_to_cart_button_for_should_be_visible(String title) {
-        FrameworkLogger.stepDefinitionStarted(ProductDetailsStepDefinitions.class, "the_add_to_cart_button_for_should_be_visible");
         productDetailsActions.should_display_product_name(title);
         productDetailsActions.should_allow_adding_product();
     }
 
     @Then("the Remove button for {string} should be visible")
     public void the_remove_button_for_should_be_visible(String title) {
-        FrameworkLogger.stepDefinitionStarted(ProductDetailsStepDefinitions.class, "the_remove_button_for_should_be_visible");
         productDetailsActions.should_display_product_name(title);
     }
 
     @When("I add details product {string} and verify the badge increases")
     public void i_add_details_product_and_verify_the_badge_increases(String title) {
-        FrameworkLogger.stepDefinitionStarted(ProductDetailsStepDefinitions.class, "i_add_details_product_and_verify_the_badge_increases");
         productDetailsActions.should_display_product_name(title);
-        workflow.add_product_to_details();
+        workflow.add_product_to_the_cart();
     }
 
     @When("I add the product to the shopping cart")
     public void i_add_the_product_to_the_shopping_cart() {
-        FrameworkLogger.stepDefinitionStarted(ProductDetailsStepDefinitions.class, "i_add_the_product_to_the_shopping_cart");
-        workflow.add_product_to_details();
+        workflow.add_product_to_the_cart();
     }
 
     @When("I remove {string} from the cart")
     public void i_remove_details_product(String title) {
-        FrameworkLogger.stepDefinitionStarted(ProductDetailsStepDefinitions.class, "i_remove_details_product");
         productDetailsActions.should_display_product_name(title);
         productDetailsActions.remove_product_from_cart();
     }
 
     @When("I add {string} to the cart")
     public void iAddToTheCart(String productName) {
-        FrameworkLogger.stepDefinitionStarted(ProductDetailsStepDefinitions.class, "iAddToTheCart");
         productDetailsActions.should_display_product_name(productName);
-        workflow.add_product_to_details();
+        workflow.add_product_to_the_cart();
     }
 
 
     @And("I remove {string} item from the cart")
     public void iRemoveItemFromTheCart(String arg0) {
-        FrameworkLogger.stepDefinitionStarted(ProductDetailsStepDefinitions.class, "iRemoveItemFromTheCart");
         productDetailsActions.remove_product_from_cart();
     }
 
     @When("I tap on the back to products button")
     public void iTapOnTheBackToProductsButton() {
-        FrameworkLogger.stepDefinitionStarted(ProductDetailsStepDefinitions.class, "iTapOnTheBackToProductsButton");
         productDetailsActions.navigate_back_to_inventory();
     }
 

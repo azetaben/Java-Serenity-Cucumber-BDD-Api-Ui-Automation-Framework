@@ -1,5 +1,7 @@
 package saucedemo.com.enums;
 
+import saucedemo.com.properties.ApplicationConfig;
+
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -26,14 +28,44 @@ public enum User {
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("Unknown SauceDemo user: " + value));
     }
 
-    public String getUsername() {
+    public String getStandardUser() {
         return this == STANDARD_USER
-                ? saucedemo.com.properties.ApplicationConfig.required("standard_user.username")
+                ? ApplicationConfig.required("standard_user.username")
+                : username;
+    }
+
+    public String getProblemUser() {
+        return this == PROBLEM_USER
+                ? ApplicationConfig.required("problem_user.username")
+                : username;
+    }
+
+    public String getLockedOutUser() {
+        return this == LOCKED_OUT_USER
+                ? ApplicationConfig.required("locked_out_user.username")
+                : username;
+    }
+
+    public String getPerformanceGlitchUser() {
+        return this == PERFORMANCE_GLITCH_USER
+                ? ApplicationConfig.required("performance_glitch_user.username")
+                : username;
+    }
+
+    public String getErrorUser() {
+        return this == ERROR_USER
+                ? ApplicationConfig.required("error_user.username")
+                : username;
+    }
+
+    public String getVisualUser() {
+        return this == VISUAL_USER
+                ? ApplicationConfig.required("visual_user.username")
                 : username;
     }
 
     public String getPassword() {
-        return saucedemo.com.properties.ApplicationConfig.required("all_users.password");
+        return ApplicationConfig.required("all_users.password");
     }
 
     public String getExpectedPage() {

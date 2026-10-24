@@ -5,12 +5,11 @@ import org.openqa.selenium.By;
 import saucedemo.com.assertions.MoneyAssertions;
 import saucedemo.com.contentdesign.PageUrls;
 import saucedemo.com.properties.SauceDemoConfig;
-
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public final class UiChecks {
     private UiChecks() {
@@ -64,7 +63,7 @@ public final class UiChecks {
 
     public static void assertTextEquals(UIInteractionSteps steps, By locator, String expected) {
         FrameworkLogger.assertionStarted(UiChecks.class, "assertTextEquals");
-        assertEquals(expected, readText(steps, locator), "Element text");
+        assertThat(readText(steps, locator)).as("Element text").isEqualTo(expected);
     }
 
 

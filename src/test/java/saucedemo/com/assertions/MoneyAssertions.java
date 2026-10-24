@@ -1,12 +1,11 @@
 package saucedemo.com.assertions;
 
 import saucedemo.com.support.FrameworkLogger;
-
 import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public final class MoneyAssertions {
     private static final Pattern DOLLAR_AMOUNT = Pattern.compile(
@@ -26,7 +25,7 @@ public final class MoneyAssertions {
 
     public static void assertAmountsEqual(String message, BigDecimal expected, BigDecimal actual) {
         FrameworkLogger.assertionStarted(MoneyAssertions.class, "assertAmountsEqual");
-        assertEquals(0, expected.compareTo(actual), message + ": expected " + expected + " but was " + actual);
+        assertThat(expected.compareTo(actual)).as(message + ": expected " + expected + " but was " + actual).isEqualTo(0);
     }
 
 }

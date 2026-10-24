@@ -2,15 +2,14 @@ package saucedemo.com.support;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ReportSecretScannerTest {
     @TempDir
@@ -23,7 +22,7 @@ class ReportSecretScannerTest {
         Files.writeString(json, "{\"description\":\"password: ci-secret\"}");
         Files.writeString(reportDirectory.resolve("safe.xml"), "<testsuite name=\"passed\"/>");
 
-        assertEquals(List.of(json), ReportSecretScanner.findLeakingFiles(List.of(reportDirectory), List.of("ci-secret")));
+        assertThat(ReportSecretScanner.findLeakingFiles(List.of(reportDirectory), List.of("ci-secret"))).isEqualTo(List.of(json));
     }
 
     @Test
@@ -41,13 +40,13 @@ class ReportSecretScannerTest {
         Files.writeString(properties, "cucumber.filter.tags=@Smoke");
         Files.write(binary, "secret_sauce".getBytes());
 
-        assertEquals(Set.of(html, json, xml, text), new HashSet<>(ReportSecretScanner.findLeakingFiles(
-                List.of(reportDirectory), List.of("", "secret_sauce"))));
+        assertThat(new HashSet<>(ReportSecretScanner.findLeakingFiles(
+                List.of(reportDirectory), List.of("", "secret_sauce")))).isEqualTo(Set.of(html, json, xml, text));
     }
 
     @Test
     void scanFailsClosedForMissingReportDirectories() {
-        assertThrows(java.io.IOException.class, () -> ReportSecretScanner.findLeakingFiles(
-                List.of(reportDirectory.resolve("missing")), List.of("secret_sauce")));
+        assertThatThrownBy(() -> ReportSecretScanner.findLeakingFiles(
+                List.of(reportDirectory.resolve("missing")), List.of("secret_sauce"))).isInstanceOf(java.io.IOException.class);
     }
 }

@@ -92,8 +92,8 @@ Feature: End to end test for SauceDemo application
     When I enter checkout information below:
       | firstName | lastName | postalCode |
       | John      | Doe      | M2 5JJ     |
-    And I continue from checkout information
-#    And I submit checkout information
+
+    And I submit checkout information
 
     # CHECKOUT OVERVIEW PAGE
     Then I should be redirected to "checkout overview" page
@@ -115,6 +115,7 @@ Feature: End to end test for SauceDemo application
     Then the Pony Express icon is visible
     And I should see the checkout confirmation "Thank you for your order!"
     And the order dispatch message is visible
+    When I generate and download the order PDF into downloadfiles
     And the Back Home button is displayed
     When I return to the inventory
     # NAVIGATION PAGE

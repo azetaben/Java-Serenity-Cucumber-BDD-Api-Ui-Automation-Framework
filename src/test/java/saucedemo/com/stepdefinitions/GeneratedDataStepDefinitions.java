@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import saucedemo.com.actions.CheckoutInfoActions;
 import saucedemo.com.actions.LoginActions;
-import saucedemo.com.support.FrameworkLogger;
 import saucedemo.com.utilities.TestDataGeneration;
 
 /**
@@ -23,22 +22,19 @@ public class GeneratedDataStepDefinitions {
 
     @Given("I generate test data using seed {long}")
     public void use_seed(long seed) {
-        FrameworkLogger.stepDefinitionStarted(GeneratedDataStepDefinitions.class, "use_seed");
         log.info("Generate scenario test data using seed: {}", seed);
         data = new TestDataGeneration(seed);
     }
 
     @When("I log in using generated {string} credentials")
     public void log_in_using_generated_credentials(String caseName) throws InterruptedException {
-        FrameworkLogger.stepDefinitionStarted(GeneratedDataStepDefinitions.class, "log_in_using_generated_credentials");
         log.info("Log in using generated credentials case: {}", caseName);
         var account = generator().login(caseName);
-        loginActions.enter_credentials(account.username(), account.password());
+        loginActions.enter_submit_login_credentials(account.username(), account.password());
     }
 
     @When("I enter generated {string} checkout information")
     public void enter_generated_checkout_information(String caseName) {
-        FrameworkLogger.stepDefinitionStarted(GeneratedDataStepDefinitions.class, "enter_generated_checkout_information");
         log.info("Enter generated checkout information case: {}", caseName);
         checkoutInfoActions.enter_checkout_information(generator().checkout(caseName));
     }
